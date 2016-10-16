@@ -14,8 +14,8 @@ GPIO.setmode(GPIO.BOARD)
 # Physical pins [13,15,16,18], [29,31,33,37], [40,38,36,32]
 #one set for each stepper axis not set to any yet.
 # GPIO17,GPIO22,GPIO23,GPIO24
-#StepPinsX = [13,15,16,18]
-#StepPinsY = [29,31,33,37]
+StepPinsX = [13,15,16,18]
+StepPinsY = [29,31,33,37]
 StepPinsZ = [40,38,36,32]
 # Set all pins as output
 for pin in StepPinsX + StepPinsY + StepPinsZ:
