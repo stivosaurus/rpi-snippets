@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from multiprocessing import Process, Queue
+import sys
 import os
 import time
 import shlex
@@ -31,10 +32,11 @@ SEQ = [(1,0,0,1),
 
 # define pins and initialize low
 GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False) 
 XPINS = [13,15,16,18]
 YPINS = [29,31,33,37]
 ZPINS = [40, 38, 36, 32]
-GPIO.setup(PINS,
+GPIO.setup(XPINS + YPINS + ZPINS,
            GPIO.OUT,
            initial=GPIO.LOW)
 
@@ -58,7 +60,7 @@ if __name__ == '__main__':
         stepx = Motorcontroller( 'stepx', que, SEQ, XPINS)
         stepy = Motorcontroller( 'stepy', que, SEQ, YPINS)
         stepy = Motorcontroller( 'stepz', que, SEQ, ZPINS)
-
+        stepx.que.put('step 100')
         # run some commands
         for con in controls:
             con.que.put( con.name) # send controller name. a NOOP cmd
