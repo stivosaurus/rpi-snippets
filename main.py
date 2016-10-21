@@ -55,28 +55,30 @@ if __name__ == '__main__':
         names = ['stepX']
 
         # list of controllers
-        controls = []   
         # create a controller & its que.  add to our list of controls
-        stepx = Motorcontroller( 'stepx', que, SEQ, XPINS)
-        stepy = Motorcontroller( 'stepy', que, SEQ, YPINS)
-        stepy = Motorcontroller( 'stepz', que, SEQ, ZPINS)
-        stepx.que.put('step 100')
+        stepx = MotorController( 'stepx', Queue(), SEQ, XPINS)
+        stepy = MotorController( 'stepy', Queue(), SEQ, YPINS)
+        stepz = MotorController( 'stepz', Queue(), SEQ, ZPINS)
+        controls = [stepx, stepy, stepz]
+
         # run some commands
         for con in controls:
-            con.que.put( con.name) # send controller name. a NOOP cmd
+            con.send( con.name) # send controller name. a NOOP cmd
             #time.sleep(1)
 
         for con in controls:
-            con.que.put( 'step 500')  # do some steps
+            con.send( 'step 5')  # do some steps
             #time.sleep(1)
+
+
+        stepx.send('step 500')
 
         # stop controller sub process
         for con in controls:
-            con.que.put('quit')
-
+            con.send('quit')
 
         # time to quit
-    except:
+    except KeyboardInterrupt:
         ex = sys.exc_info()[0]
         print('Exception: %s' % ex)
     finally:

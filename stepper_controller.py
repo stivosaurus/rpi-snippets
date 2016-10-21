@@ -19,6 +19,7 @@ class MotorController:
     reverse - set rotation direction
     quit    - kill subprocess
     """
+    
 
     def __init__(self, name, msgque, seq, pins):
         self.name  = name
@@ -30,6 +31,7 @@ class MotorController:
         self.proc = Process(target=self.run, args=())
         self.proc.start()
 
+        
     def run(self):
         try:
             runit = True
@@ -42,15 +44,12 @@ class MotorController:
                     if msg[0] == 'step':
                         # step() wants a number, not a string
                         self.step( int(msg[1]) )
-        except:
-            ex = sys.exc_info()[0]
-            print('Exception: %s' % ex)
-            GPIO.cleanup()
-            raise RuntimeError
-        
-    
-            
-                
+        except Exception as ex:
+            print('Caught exeption: %s' % ex)
+            GPIO.cleanup(self.pins)
+            #raise ex
+            sys.exit()
+
 
     def step(self, steps, wait_time=0.01):
         """cycle motor steps number of steps"""
@@ -82,6 +81,11 @@ class MotorController:
         if self.next >= len(self.seq):
             self.next = 0
         return seq
+
+
+    def send(self, msg):
+        self.que.put(msg)
+
 
 
 
