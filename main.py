@@ -72,6 +72,8 @@ if __name__ == '__main__':
 
 
         stepx.send('step 500')
+        stepy.send('step 600')
+        stepz.send('step 700')
 
         # stop controller sub process
         for con in controls:
