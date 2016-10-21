@@ -71,9 +71,9 @@ if __name__ == '__main__':
             #time.sleep(1)
 
 
-        stepx.send('step 500')
-        stepy.send('step 600')
-        stepz.send('step 700')
+        stepx.send('step 5000')
+        stepy.send('step 6000')
+        stepz.send('step 7000')
 
         # stop controller sub process
         for con in controls:
