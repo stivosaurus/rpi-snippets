@@ -31,8 +31,9 @@ SEQ = [(1,0,0,1),
 
 # define pins and initialize low
 GPIO.setmode(GPIO.BOARD)
-PINS = [13,15,16,18]
-#PINS = [40, 38, 36, 32]
+XPINS = [13,15,16,18]
+YPINS = [29,31,33,37]
+ZPINS = [40, 38, 36, 32]
 GPIO.setup(PINS,
            GPIO.OUT,
            initial=GPIO.LOW)
@@ -54,10 +55,9 @@ if __name__ == '__main__':
         # list of controllers
         controls = []   
         # create a controller & its que.  add to our list of controls
-        for nam in names:
-            que = Queue()
-            mc = MotorController( nam, que, SEQ, PINS)
-            controls.append(mc)
+        stepx = Motorcontroller( 'stepx', que, SEQ, XPINS)
+        stepy = Motorcontroller( 'stepy', que, SEQ, YPINS)
+        stepy = Motorcontroller( 'stepz', que, SEQ, ZPINS)
 
         # run some commands
         for con in controls:
