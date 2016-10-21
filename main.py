@@ -34,8 +34,8 @@ SEQ = [(1,0,0,1),
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False) 
 XPINS = [13,15,16,18]
-YPINS = [29,31,33,37]
-ZPINS = [40, 38, 36, 32]
+YPINS = [37,33,31,29]
+ZPINS = [32, 36, 38, 40]
 GPIO.setup(XPINS + YPINS + ZPINS,
            GPIO.OUT,
            initial=GPIO.LOW)
