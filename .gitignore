@@ -93,3 +93,8 @@ ENV/
 .\#*
 *~
 
+# fake RPi module
+RPi
+
+# generic junk like a.a, a.py
+?.*
