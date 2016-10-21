@@ -45,7 +45,9 @@ class MotorController:
         except:
             ex = sys.exc_info()[0]
             print('Exception: %s' % ex)
-            raise Exception
+            GPIO.cleanup()
+            raise RuntimeError
+        
     
             
                 
