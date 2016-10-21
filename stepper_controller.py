@@ -1,9 +1,10 @@
 """ stepper_controller.py
 
 Stepper motor controller for Raspberry Pi 
-"""
+n"""
 
 from multiprocessing import Process, Queue
+import sys
 import os
 import time
 import shlex
@@ -30,16 +31,24 @@ class MotorController:
         self.proc.start()
 
     def run(self):
-        runit = True
-        while(runit):
-            msg = shlex.split(self.que.get())
-            if msg:
-                print('msg:', msg)
-                if msg[0] == 'quit':
-                    break
-                if msg[0] == 'step':
-                    # step() wants a number, not a string
-                    self.step( int(msg[1]) )
+        try:
+            runit = True
+            while(runit):
+                msg = shlex.split(self.que.get())
+                if msg:
+                    print('msg:', msg)
+                    if msg[0] == 'quit':
+                        break
+                    if msg[0] == 'step':
+                        # step() wants a number, not a string
+                        self.step( int(msg[1]) )
+        except:
+            ex = sys.exc_info()[0]
+            print('Exception: %s' % ex)
+            raise Exception
+    
+            
+                
 
     def step(self, steps, wait_time=0.01):
         """cycle motor steps number of steps"""

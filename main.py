@@ -42,40 +42,47 @@ GPIO.setup(PINS,
 #
 
 if __name__ == '__main__':
-    # process id
-    print('\t= my pid:%d '% os.getpid())
-    print('\t======')
+    try:
+        # process id
+        print('\t= my pid:%d '% os.getpid())
+        print('\t======')
+        
+        # names from controllers
+        #   names = ['stepX', 'stepY', 'stepZ']
+        names = ['stepX']
 
-    # names from controllers
-    #   names = ['stepX', 'stepY', 'stepZ']
-    names = ['stepX']
-
-    # list of controllers
-    controls = []   
-    # create a controller & its que.  add to our list of controls
-    for nam in names:
+        # list of controllers
+        controls = []   
+        # create a controller & its que.  add to our list of controls
+        for nam in names:
             que = Queue()
             mc = MotorController( nam, que, SEQ, PINS)
             controls.append(mc)
 
-    # run some commands
-    for con in controls:
-        con.que.put( con.name) # send controller name. a NOOP cmd
-    time.sleep(1)
+        # run some commands
+        for con in controls:
+            con.que.put( con.name) # send controller name. a NOOP cmd
+            #time.sleep(1)
 
-    for con in controls:
-        con.que.put( 'step 500')  # do some steps
-    #time.sleep(1)
+        for con in controls:
+            con.que.put( 'step 500')  # do some steps
+            #time.sleep(1)
 
-    # stop controller sub process
-    for con in controls:
-        con.que.put('quit')
+        # stop controller sub process
+        for con in controls:
+            con.que.put('quit')
 
-    
-    # time to quit
-    for c in controls:
-        c.proc.join()
-    GPIO.cleanup()
+
+        # time to quit
+    except:
+        ex = sys.exc_info()[0]
+        print('Exception: %s' % ex)
+    finally:
+        print('cleanup')
+        for c in controls:
+            c.proc.join()
+            GPIO.cleanup()
+
     
     
 
