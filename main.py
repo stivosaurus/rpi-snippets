@@ -32,6 +32,7 @@ SEQ = [(1,0,0,1),
 # define pins and initialize low
 GPIO.setmode(GPIO.BOARD)
 PINS = [13,15,16,18]
+#PINS = [40, 38, 36, 32]
 GPIO.setup(PINS,
            GPIO.OUT,
            initial=GPIO.LOW)
@@ -63,8 +64,8 @@ if __name__ == '__main__':
     time.sleep(1)
 
     for con in controls:
-        con.que.put( 'step 10')  # do some steps
-    time.sleep(1)
+        con.que.put( 'step 500')  # do some steps
+    #time.sleep(1)
 
     # stop controller sub process
     for con in controls:

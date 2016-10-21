@@ -41,7 +41,7 @@ class MotorController:
                     # step() wants a number, not a string
                     self.step( int(msg[1]) )
 
-    def step(self, steps, wait_time=0.1):
+    def step(self, steps, wait_time=0.01):
         """cycle motor steps number of steps"""
         print("step %d" % steps)
         # for each step, set the pins for the current pattern
