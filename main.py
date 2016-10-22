@@ -75,9 +75,8 @@ class Hello(cmd.Cmd):
         try:
             val = int(arg)
             if 0 <= val < len(controls):
-                prompt.prompt = ('using %d > ' ) % val
                 current = controls[val]
-                print('using ' + current.name)
+                prompt.prompt = ('%s > ' ) % current.name
             else:
                 print('bad number')
         except ValueError:
