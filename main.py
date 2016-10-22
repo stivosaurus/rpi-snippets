@@ -49,28 +49,43 @@ GPIO.setup(XPINS + YPINS + ZPINS,
 class Hello(cmd.Cmd):
     """ simple command processor """
 
+    def preloop(self):
+        print(
+"""
+Usage:
+ List available controllers with 'list'
+ Select a controller with 'use', then send commands.
+ ? for help
+ CTRL-D or EOF to exit
+""")
+
     def do_greet(self, line):
         print( 'hello ' + line)
 
     def do_EOF(self, line):
+        """Exit program"""
         print()
         return True
 
     def do_fwd(self, args):
+        """Go forward N steps"""
         global current
         current.send('step ' + args)
     
                     
 
     def do_rev(self, args):
+        """NOT IMPLEMENTED"""
         print( ' NOT IMPL rev ' + args)
 
     def do_list(self, args):
+        """ list available controllers"""
         li = [n.name for n in controls]
         for i in range(len(li)):
             print(i, li[i])
 
     def do_use(self, arg):
+        """ Use controller N from list"""
         global current
         try:
             val = int(arg)
@@ -85,10 +100,12 @@ class Hello(cmd.Cmd):
             pass
 
     def do_current(self, line):
+        """Show name of current controller"""
         global current
         print('current: ', current.name)
 
     def do_quit(self, line):
+        """Send 'quit' to current controller"""
         global current
         current.send('quit')
     
