@@ -27,7 +27,7 @@ class MotorController:
         self.seq = seq
         self.next = 0
         self.pins = pins
-        self.pulse_time = 0.01  # time pins are set high
+        self.pulse_time = 0.001  # time pins are set high
         self.proc = Process(target=self.run, args=())
         self.proc.start()
 
@@ -51,7 +51,7 @@ class MotorController:
             sys.exit()
 
 
-    def step(self, steps, wait_time=0.01):
+    def step(self, steps, wait_time=0.0):
         """cycle motor steps number of steps"""
         print("step %d" % steps)
         # for each step, set the pins for the current pattern
