@@ -6,6 +6,9 @@ import os
 import time
 import shlex
 import cmd
+import logging
+from datetime import datetime
+
 import RPi.GPIO as GPIO
 from stepper_controller import MotorController
 
@@ -55,7 +58,6 @@ class Hello(cmd.Cmd):
 
     def do_fwd(self, args):
         global current
-        print( 'fwd ' + args)
         current.send('step ' + args)
     
                     
@@ -64,21 +66,20 @@ class Hello(cmd.Cmd):
         print( ' NOT IMPL rev ' + args)
 
     def do_list(self, args):
-        print('list')
         li = [n.name for n in controls]
         for i in range(len(li)):
             print(i, li[i])
 
     def do_use(self, arg):
         global current
-        #print('use ' + arg)
         try:
             val = int(arg)
             if 0 <= val < len(controls):
                 current = controls[val]
                 prompt.prompt = ('%s > ' ) % current.name
+                print('using controller %s' % current.name)
             else:
-                print('bad number')
+                print('bad value for %d' % val)
         except ValueError:
             print('bad arg for use')
             pass
@@ -98,17 +99,18 @@ class Hello(cmd.Cmd):
 
 if __name__ == '__main__':
     try:
-        # process id
-        print('\t= my pid:%d '% os.getpid())
-        print('\t======')
-        
-        # names from controllers
-        #   names = ['stepX', 'stepY', 'stepZ']
-        names = ['stepX']
+        # set up logging
+        logging.basicConfig(filename='stepper.log',
+                            level = logging.DEBUG)
+        logging.info("Start: %s", datetime.now() )
 
-        # list /dict of controllers
-        controls = [] 
-        # create a controller & its que.  add to our list of controls
+        # process id
+        logging.info('main pid: %d ',os.getpid())
+        
+        # create controllers and add to our list of controls
+        #  each control has its own msg queue
+
+        controls = []
         stepx = MotorController( 'stepx', Queue(), SEQ, XPINS)
         stepy = MotorController( 'stepy', Queue(), SEQ, YPINS)
         stepz = MotorController( 'stepz', Queue(), SEQ, ZPINS)
@@ -116,26 +118,22 @@ if __name__ == '__main__':
         controls.append(stepy)
         controls.append(stepz)
 
+        # log controller pids
+        for con in controls:
+            logging.info('%s pid: %d', con.name, con.proc.pid)
+        
+
         current = controls[0] # default to first in list
 
-
-
-        # # run some commands
-        # for con in controls:
-        #     con.send( con.name) # send controller name. a NOOP cmd
-        #     #time.sleep(1)
-
-        # for con in controls:
-        #     con.send( 'step 5')  # do some steps
-        #     #time.sleep(1)
-
-
+        ## send some commands
         # stepx.send('step 500')
         # stepy.send('step 600')
         # stepz.send('step 700')
 
-
+        # start command interpreter
         prompt = Hello()
+        # put current controller name in prompt
+        prompt.prompt = "%s > " % current.name
         prompt.cmdloop()
 
     # time to quit
@@ -143,14 +141,16 @@ if __name__ == '__main__':
     except KeyboardInterrupt as ex:
         print('Caught exception: %s' % ex)
     finally:
-        print('cleanup')
+        logging.info('cleanup')
         # stop controller sub process
         for con in controls:
             con.send('quit')
             
-        for c in controls:
-            c.proc.join()
+        for con in controls:
+            con.proc.join()
             GPIO.cleanup()
+        logging.info('===== done ====')
+        
 
     
     
