@@ -12,7 +12,6 @@ from datetime import datetime
 import RPi.GPIO as GPIO
 from stepper_controller import MotorController
 
-
 # stepper sequence.  motor dependent
 # SEQ = [(1,0,0,0),
 #        (0,1,0,0),
@@ -49,15 +48,22 @@ GPIO.setup(XPINS + YPINS + ZPINS,
 class Hello(cmd.Cmd):
     """ simple command processor """
 
-    def preloop(self):
-        print(
-"""
+    # def __init__(self):
+    #     cmd.Cmd.__init__(self)
+    
+
+    # printed at start of lopo
+    intro = """
 Usage:
  List available controllers with 'list'
  Select a controller with 'use', then send commands.
  ? for help
  CTRL-D or EOF to exit
-""")
+"""
+
+    # def preloop(self):
+    #     """stuff done *before* command loops starts """
+    #     pass
 
     def do_greet(self, line):
         print( 'hello ' + line)
@@ -71,8 +77,6 @@ Usage:
         """Go forward N steps"""
         global current
         current.send('step ' + args)
-    
-                    
 
     def do_rev(self, args):
         """NOT IMPLEMENTED"""
@@ -108,8 +112,38 @@ Usage:
         """Send 'quit' to current controller"""
         global current
         current.send('quit')
-    
-    
+
+    def do_file(self, line):
+        """ Read commands from a file instead of keyboard"""
+        global current
+
+        parsed = shlex.split(line)
+        #save state
+        old_use_rawinput = self.use_rawinput
+        old_prompt = self.prompt
+
+        self.useraw_input = False
+        self.prompt = ""
+        try:
+            name = parsed[0]
+            print('== executing from: %s' % name)
+            with open(name, 'rt') as fi:
+                lines = [l.strip() for l in fi.readlines()]
+            # for li in lines:
+            #     self.onecmd(li)  # execute single command
+            # stuff contents of file into command loop
+            self.cmdqueue = lines  
+        except Exception as ex:
+            print(ex)
+        
+        finally:
+            # restore state
+            self.lastcmd = ""
+            self.use_rawinput = old_use_rawinput
+            self.prompt = old_prompt
+            #print('== done: %s' % name)
+
+
 #
 # main line
 #
@@ -167,14 +201,3 @@ if __name__ == '__main__':
             con.proc.join()
             GPIO.cleanup()
         logging.info('===== done ====')
-        
-
-    
-    
-
-
-
-
-
-
-
