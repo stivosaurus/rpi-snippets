@@ -2,3 +2,5 @@ current
 use 0
 fwd 10
 fwd 100
+use 1
+fwd 200
