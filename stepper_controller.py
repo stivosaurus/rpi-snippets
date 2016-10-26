@@ -59,6 +59,11 @@ class MotorController:
     def step(self, steps, wait_time=0.0):
         """cycle motor steps number of steps"""
         logging.info("%s step %d", self.name, steps)
+        if steps < 0:
+            direction = -1
+            steps = str(steps).replace('-', '')
+        else:
+            direction = 1
         # for each step, set the pins for the current pattern
         for s in range(steps):
             self.toggle_pins(self.pins,

@@ -43,7 +43,7 @@ plt.ylim(-1.5,1.5)
 plt.plot(list_x2_axis,list_y2_axis,c='r')
  
 # show the plot
-#plt.show()
+plt.show()
 #print file_write
 time.sleep(10)
 quit()
