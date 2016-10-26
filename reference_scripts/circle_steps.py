@@ -2,6 +2,7 @@
  
 from math import sin,cos,pi
 import matplotlib.pyplot as plt
+import time
  
 # use radians instead of degrees - OBVIOUSLY!! 
 list_radians = [0]
@@ -13,6 +14,7 @@ for i in range(0,360):
     list_radians.append(pi/float_div)
      
 # list of coordinates for each point
+file_write = ''
 position = 0
 list_x2_axis = []
 list_y2_axis = []
@@ -26,6 +28,8 @@ for a in list_radians:
     list_y2_axis.append(sin(a))
     #print out the next position to advance to
     print position, int((cos(a)-last_position_x)*10000), int((sin(a)-last_position_y)*10000)
+    add=int((cos(a)-last_position_x)*10000), int((sin(a)-last_position_y)*10000), 0
+    file_write = file_write + str(add) +"\n"
     #set the old position in a variable
     last_position_x = cos(a)
     last_position_y = sin(a)
@@ -38,4 +42,7 @@ plt.ylim(-1.5,1.5)
 plt.plot(list_x2_axis,list_y2_axis,c='r')
  
 # show the plot
-plt.show()
+#plt.show()
+print file_write
+time.sleep(10)
+quit()
