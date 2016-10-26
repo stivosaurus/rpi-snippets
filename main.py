@@ -65,17 +65,10 @@ Usage:
     #     """stuff done *before* command loops starts """
     #     pass
 
-    def postcmd(self, stop, line):
-        global status_que
+    # def postcmd(self, stop, line):
+    #     """ stuff done after *each* command """
+    #     pass
 
-        msg = "none"
-        # if stop is True, we need to wait for sync
-        if stop:
-            logging.debug('postcmd %d', stop)
-            msg = status_que.get()
-            logging.debug('status que read: %s ', msg)
-        if line == 'EOF':
-            return True
 
 
     def do_greet(self, line):
@@ -85,13 +78,14 @@ Usage:
         """Exit program"""
         logging.debug("do EOF")
         print()
-        return False
+        return True # to exit the command interpreter loop
 
     def do_fwd(self, args):
         """Go forward N steps"""
         global current
         current.send('step ' + args)
-        return True
+        print(status_que.get(timout=10))
+
 
     def do_mov(self, args):
         """ move X Y Z  steps """
@@ -105,9 +99,9 @@ Usage:
             controls[1].send('step ' + y_steps)
             controls[2].send('step ' + z_steps)
             # wait for returns
-            print(status_que.get())
-            print(status_que.get())
-            print(status_que.get())
+            print(status_que.get(timeout=10))
+            print(status_que.get(timeout=10))
+            print(status_que.get(timeout=10))
             return False
         except Exception as ex:
             logging.debug(ex)
