@@ -65,6 +65,19 @@ Usage:
     #     """stuff done *before* command loops starts """
     #     pass
 
+    def postcmd(self, stop, line):
+        global status_que
+
+        msg = "none"
+        # if stop is True, we need to wait for sync
+        if stop:
+            logging.debug('postcmd %d', stop)
+            msg = status_que.get()
+            logging.debug('status que read: %s ', msg)
+        if line == 'EOF':
+            return True
+
+
     def do_greet(self, line):
         print( 'hello ' + line)
 
@@ -80,6 +93,26 @@ Usage:
         current.send('step ' + args)
         return True
 
+    def do_mov(self, args):
+        """ move X Y Z  steps """
+        """
+        for now, we assume controllers are numbered 0, 1, 2
+        """
+        logging.debug("do mov: " + args)
+        try:
+            (x_steps, y_steps, z_steps) = [ i for i in shlex.split(args)]
+            controls[0].send('step ' + x_steps)
+            controls[1].send('step ' + y_steps)
+            controls[2].send('step ' + z_steps)
+            # wait for returns
+            print(status_que.get())
+            print(status_que.get())
+            print(status_que.get())
+            return False
+        except Exception as ex:
+            logging.debug(ex)
+        
+        
     def do_rev(self, args):
         """NOT IMPLEMENTED"""
         print( ' NOT IMPL rev ' + args)
@@ -147,17 +180,6 @@ Usage:
             self.prompt = old_prompt
             #print('== done: %s' % name)
 
-    def postcmd(self, stop, line):
-        global status_que
-
-        msg = "none"
-        if stop:
-            logging.debug('postcmd %d', stop)
-            msg = status_que.get()
-            logging.debug('status que read: %s ', msg)
-        if line == 'EOF':
-            return True
-        
 
 
 #
