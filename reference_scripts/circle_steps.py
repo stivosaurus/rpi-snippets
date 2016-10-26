@@ -13,6 +13,7 @@ for i in range(0,360):
     list_radians.append(pi/float_div)
      
 # list of coordinates for each point
+position = 0
 list_x2_axis = []
 list_y2_axis = []
 last_position_x = 0
@@ -20,11 +21,11 @@ last_position_y = 0
 # calculate coordinates 
 # and append to above list
 for a in list_radians:
+    position += 1
     list_x2_axis.append(cos(a))
     list_y2_axis.append(sin(a))
     #print out the next position to advance to
-    print int((cos(a)-last_position_x)*1000)
-    print int((sin(a)-last_position_y)*1000)
+    print position, int((cos(a)-last_position_x)*10000), int((sin(a)-last_position_y)*10000)
     #set the old position in a variable
     last_position_x = cos(a)
     last_position_y = sin(a)
