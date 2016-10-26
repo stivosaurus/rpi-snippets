@@ -22,9 +22,10 @@ class MotorController:
     """
     
 
-    def __init__(self, name, msgque, seq, pins):
+    def __init__(self, name, msgque, status_que, seq, pins):
         self.name  = name
         self.que = msgque
+        self.statque = status_que
         self.seq = seq
         self.next = 0
         self.pins = pins
@@ -35,7 +36,7 @@ class MotorController:
         
     def run(self):
         try:
-            
+            logging.debug('return que %s', self.statque)
             runit = True
             while(runit):
                 msg = shlex.split(self.que.get())
@@ -46,6 +47,8 @@ class MotorController:
                     if msg[0] == 'step':
                         # step() wants a number, not a string
                         self.step( int(msg[1]) )
+                        logging.debug("sending done msg")
+                self.statque.put(' i be done')
         except Exception as ex:
             logging.info('Caught exeption: %s', ex)
             GPIO.cleanup(self.pins)

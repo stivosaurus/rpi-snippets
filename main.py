@@ -70,13 +70,15 @@ Usage:
 
     def do_EOF(self, line):
         """Exit program"""
+        logging.debug("do EOF")
         print()
-        return True
+        return False
 
     def do_fwd(self, args):
         """Go forward N steps"""
         global current
         current.send('step ' + args)
+        return True
 
     def do_rev(self, args):
         """NOT IMPLEMENTED"""
@@ -87,6 +89,7 @@ Usage:
         li = [n.name for n in controls]
         for i in range(len(li)):
             print(i, li[i])
+
 
     def do_use(self, arg):
         """ Use controller N from list"""
@@ -102,6 +105,7 @@ Usage:
         except ValueError:
             print('bad arg for use')
             pass
+        
 
     def do_current(self, line):
         """Show name of current controller"""
@@ -143,6 +147,18 @@ Usage:
             self.prompt = old_prompt
             #print('== done: %s' % name)
 
+    def postcmd(self, stop, line):
+        global status_que
+
+        msg = "none"
+        if stop:
+            logging.debug('postcmd %d', stop)
+            msg = status_que.get()
+            logging.debug('status que read: %s ', msg)
+        if line == 'EOF':
+            return True
+        
+
 
 #
 # main line
@@ -158,13 +174,16 @@ if __name__ == '__main__':
         # process id
         logging.info('main pid: %d ',os.getpid())
         
+        # return messages from controllers
+        status_que = Queue()
+        
         # create controllers and add to our list of controls
         #  each control has its own msg queue
 
         controls = []
-        stepx = MotorController( 'stepx', Queue(), SEQ, XPINS)
-        stepy = MotorController( 'stepy', Queue(), SEQ, YPINS)
-        stepz = MotorController( 'stepz', Queue(), SEQ, ZPINS)
+        stepx = MotorController( 'stepx', Queue(), status_que, SEQ, XPINS)
+        stepy = MotorController( 'stepy', Queue(), status_que, SEQ, YPINS)
+        stepz = MotorController( 'stepz', Queue(), status_que, SEQ, ZPINS)
         controls.append(stepx)
         controls.append(stepy)
         controls.append(stepz)
