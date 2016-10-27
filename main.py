@@ -84,7 +84,7 @@ Usage:
         """Go forward N steps"""
         global current
         current.send('step ' + args)
-        print(status_que.get(timout=10))
+        print(status_que.get(timeout=10))
 
 
     def do_mov(self, args):
