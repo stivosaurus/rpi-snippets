@@ -61,13 +61,13 @@ class MotorController:
         logging.info("%s step %d", self.name, steps)
         if steps < 0:
             direction = -1
-            steps = str(steps).replace('-', '')
+            steps = abs(steps)
         else:
             direction = 1
         # for each step, set the pins for the current pattern
         for s in range(steps):
             self.toggle_pins(self.pins,
-                             self.next_sequence())
+                             self.next_sequence(direction))
             time.sleep(wait_time)
 
 
@@ -82,12 +82,15 @@ class MotorController:
         GPIO.output( i[0], GPIO.LOW)
 
 
-    def next_sequence(self):
+    def next_sequence(self, direction):
         """ returns next tuple of values from sequece """
         seq = self.seq[self.next]
         # bump pointer
         # todo  handle reverse direction
-        self.next += 1
+        print (direction)
+        self.next += direction
+        if self.next < 0:
+            self.next = len(self.seq)-1
         if self.next >= len(self.seq):
             self.next = 0
         return seq
