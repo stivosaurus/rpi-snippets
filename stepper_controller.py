@@ -87,7 +87,8 @@ class MotorController:
         seq = self.seq[self.next]
         # bump pointer
         # todo  handle reverse direction
-        print (direction)
+        #print (direction) added the variable direction which hold 1 or -1
+
         self.next += direction
         if self.next < 0:
             self.next = len(self.seq)-1
