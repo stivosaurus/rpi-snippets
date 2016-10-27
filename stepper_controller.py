@@ -84,7 +84,6 @@ class MotorController:
 
     def next_sequence(self, direction):
         """ returns next tuple of values from sequece """
-        seq = self.seq[self.next]
         # bump pointer
         # todo  handle reverse direction
         #print (direction) added the variable direction which hold 1 or -1
@@ -94,6 +93,7 @@ class MotorController:
             self.next = len(self.seq)-1
         if self.next >= len(self.seq):
             self.next = 0
+        seq = self.seq[self.next]
         return seq
 
 
