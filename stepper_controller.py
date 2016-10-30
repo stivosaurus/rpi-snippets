@@ -78,8 +78,8 @@ class MotorController:
         for i in zip(pins, seq):
             ##print(i)
             GPIO.output(i[0], i[1])
-        time.sleep( self.pulse_time)
-        GPIO.output( i[0], GPIO.LOW)
+            time.sleep( self.pulse_time)
+            GPIO.output( i[0], GPIO.LOW)
 
 
     def next_sequence(self, direction):
