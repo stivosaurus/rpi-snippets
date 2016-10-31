@@ -5,17 +5,18 @@ from pygame.locals import *
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
 RED = (255, 0, 0) 
  
 def show_pointer_coords(screen, x, y):
     # pointer
-    pygame.draw.ellipse(screen, GREEN, [1 + x, y, 10, 10], 0)
+    pygame.draw.ellipse(screen, GREEN, [1 + x-5, y-5, 10, 10], 1)
     
 def show_x_y(screen, x, y):
     coord = myfont.render("coords = %i %i"%(x - 100, y - 30), 2,RED)
     screen.blit(coord, (5, 5))
-    credit = myfont.render("By Stiv & Berg",3, WHITE)
-    screen.blit(credit, (5, 680)) 
+    credit = myfont.render("By Stiv & Berg",3, BLUE)
+    screen.blit(credit, (1050, 630)) 
 
 def mouse_pos(screen):
     mousex, mousey = pygame.mouse.get_pos()
@@ -23,14 +24,14 @@ def mouse_pos(screen):
     screen.blit(mouse_pos, (200, 5))
 
 def draw_screen_boarder(screen):
-    pygame.draw.rect(screen,GREEN,(100,30,900,650),1)
+    pygame.draw.rect(screen,GREEN,(100,30,900,610),1)
 
 
 # Setup
 pygame.init()
  
 # Set the width and height of the screen [width,height]
-size = [1200, 700]
+size = [1200, 650]
 screen = pygame.display.set_mode(size)
  
 pygame.display.set_caption("Plotter 2D Co-Ords")
@@ -76,13 +77,17 @@ while not done:
                 y_speed = -3
             elif event.key == pygame.K_DOWN:
                 y_speed = 3
-        #mouse position whenh left clicked        
-        if event.type == pygame.MOUSEBUTTONDOWN:
-
-            (mouseX, mouseY) = pygame.mouse.get_pos()
-            x_coord = mouseX
-            y_coord = mouseY
-            print mouseX, mouseY        
+        #mouse position when left clicked        
+        if event.type == pygame.LEFTMOUSEBUTTONDOWN:
+			(mouseX, mouseY) = pygame.mouse.get_pos()
+			#make sure clicking outside the box has no effect
+			if mouseX <= 99 or mouseX >= 991 or mouseY <= 29 or mouseY >= 631:
+				#do nothing
+				pass
+			else:
+				x_coord = mouseX
+				y_coord = mouseY
+				print mouseX, mouseY        
  
         # User let up on a key
         elif event.type == pygame.KEYUP:
@@ -104,8 +109,8 @@ while not done:
     if x_coord <= 100:
         x_coord = 100
 
-    if y_coord >= 670:
-        y_coord = 670
+    if y_coord >= 630:
+        y_coord = 630
     if y_coord <= 30:
         y_coord = 30
     #print(x_coord, y_coord)#show where pointer is in console
