@@ -13,18 +13,25 @@ def show_pointer_coords(screen, x, y):
     pygame.draw.ellipse(screen, GREEN, [1 + x-5, y-5, 10, 10], 1)
     
 def show_x_y(screen, x, y):
-    coord = myfont.render("coords = %i %i"%(x - 100, y - 30), 2,RED)
+    coord = myfont.render("Co-Ords = %i %i"%(x - 100, y - 30), 2,WHITE)
     screen.blit(coord, (5, 5))
     credit = myfont.render("By Stiv & Berg",3, BLUE)
-    screen.blit(credit, (1050, 630)) 
+    screen.blit(credit, (1050, 630))
+    credit = myfont.render("By Stiv & Berg",3, WHITE)
+    screen.blit(credit, (1052, 628)) 
 
 def mouse_pos(screen):
     mousex, mousey = pygame.mouse.get_pos()
-    mouse_pos = myfont.render("mouse position = %i %i"%(mousex-100, mousey-30), 2,RED)
+    mouse_pos = myfont.render("Mouse Position = %i %i"%(mousex-100, mousey-30), 2,WHITE)
     screen.blit(mouse_pos, (200, 5))
+    if mousex <= 99 or mousex >= 1091 or mousey <= 29 or mousey >= 635:
+		#do nothing
+		pygame.mouse.set_visible(0)
+    else:
+		pygame.mouse.set_visible(1)
 
 def draw_screen_boarder(screen):
-    pygame.draw.rect(screen,GREEN,(100,30,900,610),1)
+    pygame.draw.rect(screen,GREEN,(100,30,990,605),1)
 
 
 # Setup
@@ -81,7 +88,7 @@ while not done:
         if event.type == pygame.MOUSEBUTTONDOWN:
 			(mouseX, mouseY) = pygame.mouse.get_pos()
 			#make sure clicking outside the box has no effect
-			if mouseX <= 99 or mouseX >= 991 or mouseY <= 29 or mouseY >= 631:
+			if mouseX <= 99 or mouseX >= 1091 or mouseY <= 29 or mouseY >= 635:
 				#do nothing
 				pass
 			else:
@@ -104,13 +111,13 @@ while not done:
     y_coord = y_coord + y_speed
     
     #THIS  makes sure the pointer stay inside the limits
-    if x_coord >= 990:
-        x_coord = 990
+    if x_coord >= 1090:
+        x_coord = 1090
     if x_coord <= 100:
         x_coord = 100
 
-    if y_coord >= 630:
-        y_coord = 630
+    if y_coord >= 635:
+        y_coord = 635
     if y_coord <= 30:
         y_coord = 30
     #print(x_coord, y_coord)#show where pointer is in console
