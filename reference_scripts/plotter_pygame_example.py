@@ -6,15 +6,20 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
-RED = (255, 0, 0) 
+RED = (255, 0, 0)
+DARKGRAY  = ( 64,  64,  64)
+GRAY      = (128, 128, 128)
+LIGHTGRAY = (212, 208, 200) 
  
 def show_pointer_coords(screen, x, y):
     # pointer
     pygame.draw.ellipse(screen, GREEN, [1 + x-5, y-5, 10, 10], 1)
     
 def show_x_y(screen, x, y):
-    coord = myfont.render("Co-Ords = %i %i"%(x - 100, y - 30), 2,WHITE)
+    coord = myfont.render("Co-Ords = %i %i"%(x - 100, y - 30), 2,BLUE)
     screen.blit(coord, (5, 5))
+    coord = myfont.render("Co-Ords = %i %i"%(x - 100, y - 30), 2,WHITE)
+    screen.blit(coord, (6, 6))    
     credit = myfont.render("By Stiv & Berg",3, BLUE)
     screen.blit(credit, (1050, 630))
     credit = myfont.render("By Stiv & Berg",3, WHITE)
@@ -22,16 +27,19 @@ def show_x_y(screen, x, y):
 
 def mouse_pos(screen):
     mousex, mousey = pygame.mouse.get_pos()
-    mouse_pos = myfont.render("Mouse Position = %i %i"%(mousex-100, mousey-30), 2,WHITE)
+    mouse_pos = myfont.render("Mouse Position = %i %i"%(mousex-100, mousey-30), 2,BLUE)
     screen.blit(mouse_pos, (200, 5))
+    mouse_pos = myfont.render("Mouse Position = %i %i"%(mousex-100, mousey-30), 2,WHITE)
+    screen.blit(mouse_pos, (201, 6))
     if mousex <= 99 or mousex >= 1091 or mousey <= 29 or mousey >= 635:
-		#do nothing
-		pygame.mouse.set_visible(0)
+		#make mouse change if outside box but needs work
+		#TODO fix mouse design or change mouse colour when it leaves coord box
+		pygame.mouse.set_visible(1)
     else:
 		pygame.mouse.set_visible(1)
 
 def draw_screen_boarder(screen):
-    pygame.draw.rect(screen,GREEN,(100,30,990,605),1)
+    pygame.draw.rect(screen,LIGHTGRAY,(100,30,990,605),1)
 
 
 # Setup
