@@ -78,7 +78,7 @@ while not done:
             elif event.key == pygame.K_DOWN:
                 y_speed = 3
         #mouse position when left clicked        
-        if event.type == pygame.LEFTMOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN:
 			(mouseX, mouseY) = pygame.mouse.get_pos()
 			#make sure clicking outside the box has no effect
 			if mouseX <= 99 or mouseX >= 991 or mouseY <= 29 or mouseY >= 631:
