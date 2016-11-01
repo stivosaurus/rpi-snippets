@@ -77,6 +77,8 @@ while not done:
     # --- Event Processing
     
     for event in pygame.event.get():
+        
+
         if event.type == pygame.QUIT:
             done = True
             # User pressed down on a key
@@ -84,6 +86,7 @@ while not done:
         elif event.type == pygame.KEYDOWN:
             # Figure out if it was an arrow key. If so
             # adjust speed.
+            print (pygame.key.name(event.key))
             if event.key == pygame.K_LEFT:
                 x_speed = -3
             elif event.key == pygame.K_RIGHT:
@@ -92,6 +95,8 @@ while not done:
                 y_speed = -3
             elif event.key == pygame.K_DOWN:
                 y_speed = 3
+            elif event.key == pygame.K_ESCAPE:
+                sys.exit()
         #mouse position when left clicked        
         if event.type == pygame.MOUSEBUTTONDOWN:
 			(mouseX, mouseY) = pygame.mouse.get_pos()
