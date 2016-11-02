@@ -22,14 +22,14 @@ class MotorController:
     """
     
 
-    def __init__(self, name, msgque, status_que, seq, pins):
+    def __init__(self, name, msgque, status_que, seq, pins, pulse_time=0.002):
         self.name  = name
         self.que = msgque
         self.statque = status_que
         self.seq = seq
         self.next = 0
         self.pins = pins
-        self.pulse_time = 0.001  # time pins are set high
+        self.pulse_time = pulse_time # time pins are set high
         self.proc = Process(target=self.run, args=())
         self.proc.start()
 
@@ -74,7 +74,8 @@ class MotorController:
     def toggle_pins( self, pins, seq):
         """ set pins according to sequence tuple """
         ##print( seq)
-        # set pins for pulse time, then clear
+        # set pins, wait for pulse time, then clear
+        # we assume that setting pins takes negligible amount of time
         for i in zip(pins, seq):
             ##print(i)
             GPIO.output(i[0], i[1])
