@@ -3,7 +3,7 @@
 Stepper motor controller for Raspberry Pi 
 n"""
 
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Pipe
 import sys
 import os
 import time
@@ -11,8 +11,28 @@ import shlex
 import logging
 import RPi.GPIO as GPIO
 
+def myfunc(conn):
+    done = False
+    while not done:
+        logging.debug('** myfunc waiting...')
+        msg = conn.recv()
+        logging.debug('** msg is: %s', msg)
+        if msg in [None, "quit"]:
+            logging.debug('** myfunc received quit')
+            done = True
+            break
 
-class MotorController:
+        time.sleep(2)
+    #conn.send([42, None, "hello"])
+    # done
+    logging.debug("** myfunc exiting")
+    conn.close()
+    sys.exit()
+
+
+
+
+class MotorController(object):
     """R-Pi stepper controller.
     language:
     step N  - do N rotation steps
@@ -20,26 +40,30 @@ class MotorController:
     reverse - set rotation direction
     quit    - kill subprocess
     """
-    
 
-    def __init__(self, name, msgque, status_que, seq, pins, pulse_time=0.002):
+    
+    def __init__(self, name, conn, seq, pins, pulse_time=0.002):
         self.name  = name
-        self.que = msgque
-        self.statque = status_que
+        self.conn = conn
         self.seq = seq
         self.next = 0
         self.pins = pins
         self.pulse_time = pulse_time # time pins are set high
-        self.proc = Process(target=self.run, args=())
+        # fixme self.proc = Process(target=self.run, args=())
+        self.proc = Process(target=myfunc, args=(conn,))
         self.proc.start()
 
         
     def run(self):
         try:
-            logging.debug('return que %s', self.statque)
+            logging.debug('in run()')
             runit = True
             while(runit):
-                msg = shlex.split(self.que.get())
+                # read a command
+                print('reading command')
+                raw_msg = self.conn.recv()
+                logging.debug('raw msg: %s' % raw_msg)
+                msg = shlex.split(raw_msg)
                 if msg:
                     logging.debug('%s msg: %s', self.name, msg)
                     if msg[0] == 'quit':
@@ -48,11 +72,11 @@ class MotorController:
                         # step() wants a number, not a string
                         self.step( int(msg[1]) )
                         logging.debug("sending done msg")
-                self.statque.put(' i be done')
+                # fixme self.statque.put(' i be done')
         except Exception as ex:
             logging.info('Caught exeption: %s', ex)
             GPIO.cleanup(self.pins)
-            #raise ex
+            raise ex
             sys.exit()
 
 
@@ -100,7 +124,7 @@ class MotorController:
 
 
     def send(self, msg):
-        self.que.put(msg)
+        self.conn.send(msg)
 
 
 
