@@ -11,23 +11,25 @@ import shlex
 import logging
 import RPi.GPIO as GPIO
 
-def myfunc(conn):
-    done = False
-    while not done:
-        logging.debug('** myfunc waiting...')
-        msg = conn.recv()
-        logging.debug('** msg is: %s', msg)
-        if msg in [None, "quit"]:
-            logging.debug('** myfunc received quit')
-            done = True
-            break
+logger = logging.getLogger(__name__)
 
-        time.sleep(2)
-    #conn.send([42, None, "hello"])
-    # done
-    logging.debug("** myfunc exiting")
-    conn.close()
-    sys.exit()
+# def myfunc(conn):
+#     done = False
+#     while not done:
+#         logger.debug('** myfunc waiting...')
+#         msg = conn.recv()
+#         logger.debug('** msg is: %s', msg)
+#         if msg in [None, "quit"]:
+#             logger.debug('** myfunc received quit')
+#             done = True
+#             break
+
+#         time.sleep(2)
+#     #conn.send([42, None, "hello"])
+#     # done
+#     logger.debug("** myfunc exiting")
+#     conn.close()
+#     sys.exit()
 
 
 
@@ -49,32 +51,30 @@ class MotorController(object):
         self.next = 0
         self.pins = pins
         self.pulse_time = pulse_time # time pins are set high
-        # fixme self.proc = Process(target=self.run, args=())
-        self.proc = Process(target=myfunc, args=(conn,))
+        self.proc = Process(target=self.run, args=())
         self.proc.start()
 
         
     def run(self):
         try:
-            logging.debug('in run()')
+            #logger.debug('in run()')
             runit = True
             while(runit):
                 # read a command
-                print('reading command')
                 raw_msg = self.conn.recv()
-                logging.debug('raw msg: %s' % raw_msg)
+                logger.debug('raw msg: %s' % raw_msg)
                 msg = shlex.split(raw_msg)
                 if msg:
-                    logging.debug('%s msg: %s', self.name, msg)
+                    logger.debug('%s msg: %s', self.name, msg)
                     if msg[0] == 'quit':
                         break
                     if msg[0] == 'step':
                         # step() wants a number, not a string
                         self.step( int(msg[1]) )
-                        logging.debug("sending done msg")
-                # fixme self.statque.put(' i be done')
+                        logger.debug("%s sending done msg", self.name)
+                self.conn.send('{} i be done'.format(self.name))
         except Exception as ex:
-            logging.info('Caught exeption: %s', ex)
+            logger.info('%s Caught exeption: %s', self.name, ex)
             GPIO.cleanup(self.pins)
             raise ex
             sys.exit()
@@ -82,7 +82,7 @@ class MotorController(object):
 
     def step(self, steps, wait_time=0.0):
         """cycle motor steps number of steps"""
-        logging.info("%s step %d", self.name, steps)
+        logger.info("%s step %d", self.name, steps)
         if steps < 0:
             direction = -1
             steps = abs(steps)

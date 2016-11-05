@@ -1,6 +1,6 @@
 #!/usr/bin/python2
 
-from multiprocessing import Process, Queue, Pipe
+from multiprocessing import Process, Pipe
 import sys
 import os
 import time
@@ -8,11 +8,12 @@ import shlex
 import cmd
 import logging
 from datetime import datetime
+from collections import namedtuple
 
 import RPi.GPIO as GPIO
 from stepper_controller import MotorController
 
-# stepper sequence.  motor dependent
+# stepper sequence exampe.  motor dependent
 # SEQ = [(1,0,0,0),
 #        (0,1,0,0),
 #        (1,1,0,0),
@@ -32,7 +33,9 @@ SEQ = [(1,0,0,1),
        (0,0,1,1),
        (0,0,0,1)]
 
+#
 # define pins and initialize low
+#
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False) 
 XPINS = [13,15,16,18]
@@ -69,9 +72,9 @@ Usage:
     #     pass
 
 
-
-    def do_greet(self, line):
-        print( 'hello ' + line)
+    def do_exit(self, line):
+        """ exit program"""
+        return self.do_EOF( line)
 
     def do_EOF(self, line):
         """Exit program"""
@@ -83,8 +86,8 @@ Usage:
         """Go forward N steps"""
         global current
         logging.debug("*main do_fwd() ")
-        current[PIPE].send('step ' + args)
-        #fixme print(status_que.get(timeout=10))
+        current.pipe.send('step ' + args)
+        print( current.pipe.recv())  # timeout?
 
 
     def do_mov(self, args):
@@ -94,18 +97,22 @@ Usage:
         """
         logging.debug("do mov: " + args)
         try:
-            #(x_steps, y_steps, z_steps) = [ i for i in shlex.split(args)]
+            # x_steps, y_steps, z_steps
             steps = [ i for i in shlex.split(args)]
-            for con, st in zip(controls, steps):
-                con[PIPE].send('step ' + st)
+            if len(steps) != 3:
+                raise ValueError("wrong number of args")
 
-            # # wait for returns
-            # print(status_que.get(timeout=10))
-            # print(status_que.get(timeout=10))
-            # print(status_que.get(timeout=10))
-            return False
+            # send commands
+            for con, st in zip(controls, steps):
+                con.pipe.send('step ' + st)
+
+            # wait for returns
+            for con in controls:
+                print(con.pipe.recv())
         except Exception as ex:
             logging.debug(ex)
+        finally:
+            return False
         
         
     def do_rev(self, args):
@@ -114,7 +121,7 @@ Usage:
 
     def do_list(self, args):
         """ list available controllers"""
-        li = [n[PROC].name for n in controls]
+        li = [n.process.name for n in controls]
         for i, name in enumerate(li):
             print(i, name)
 
@@ -126,8 +133,8 @@ Usage:
             val = int(arg)
             if 0 <= val < len(controls):
                 current = controls[val]
-                prompt.prompt = ('%s > ' ) % current[PROC].name
-                print('using controller %s' % current[PROC].name)
+                prompt.prompt = ('%s > ' ) % current.process.name
+                print('using controller %s' % current.process.name)
             else:
                 print('bad value for %d' % val)
         except ValueError:
@@ -138,12 +145,12 @@ Usage:
     def do_current(self, line):
         """Show name of current controller"""
         global current
-        print('current: ', current[PROC].name)
+        print('current: ', current.process.name)
 
     def do_quit(self, line):
         """Send 'quit' to current controller"""
         global current
-        current[PIPE].send('quit')
+        current.pipe.send('quit')
 
     def do_file(self, line):
         """ Read commands from a file instead of keyboard"""
@@ -167,57 +174,57 @@ Usage:
             self.cmdqueue = lines  
         except Exception as ex:
             print(ex)
-        
+            raise ex
         finally:
             # restore state
             self.lastcmd = ""
             self.use_rawinput = old_use_rawinput
             self.prompt = old_prompt
-            #print('== done: %s' % name)
 
 
+
+
+# container for the controllers we create
+Control = namedtuple('Control', 'process pipe')
 
 #
 # main line
 #
 
 if __name__ == '__main__':
-    PROC = 0 # first item in a control
-    PIPE = 1 # 2nd item in a control
-
     try:
         # set up logging
         logging.basicConfig(filename='stepper.log',
                             level = logging.DEBUG)
-        logging.info("Start: %s", datetime.now() )
+        logger = logging.getLogger(__name__)
+        logger.info("Start: %s", datetime.now() )
 
         # our process id
-        logging.info('main pid: %d ',os.getpid())
+        logger.info('main pid: %d ',os.getpid())
         
         
         # create controllers and add to our list of controls
         #  a control consists of a class ref and a pipe
 
+        # fixme : use a Factory
+
         controls = []
         parent_conn, child_conn = Pipe()  # (parent_conn, child_conn)
-        logging.debug("*main parent %s  child %s" % (parent_conn, child_conn))
         stepx = MotorController( 'stepx', child_conn, SEQ, XPINS)
-        controls.append([stepx, parent_conn])
+        controls.append(Control(stepx, parent_conn))
         
         parent_conn, child_conn = Pipe()  # (parent_conn, child_conn)
-        logging.debug("*main parent %s  child %s" % (parent_conn, child_conn))
         stepy = MotorController( 'stepy', child_conn, SEQ, YPINS)
-        controls.append([stepy, parent_conn])
+        controls.append(Control(stepy, parent_conn))
 
-        
-        # conn = Pipe()  # (parent_conn, child_conn)
-        # stepz = MotorController( 'stepz', child_conn, SEQ, ZPINS)
-        # controls.append([stepz, parent_conn])
+        parent_conn, child_conn = Pipe()  # (parent_conn, child_conn)
+        stepz = MotorController( 'stepz', child_conn, SEQ, ZPINS)
+        controls.append(Control(stepz, parent_conn))
         
 
         # log controller pids
         for con in controls:
-            logging.info('%s pid: %d', con[PROC].name, con[PROC].proc.pid)
+            logger.info('%s pid: %d', con.process.name, con.process.proc.pid)
 
         current = controls[0] # default to first in list
 
@@ -225,7 +232,7 @@ if __name__ == '__main__':
         prompt = Hello()
         
         # put current controller name in prompt
-        prompt.prompt = "%s > " % current[PROC].name
+        prompt.prompt = "%s > " % current.process.name
 
         # run interpreter
         prompt.cmdloop()
@@ -234,12 +241,12 @@ if __name__ == '__main__':
     except KeyboardInterrupt as ex:
         print('Caught exception: %s' % ex)
     finally:
-        logging.info('cleanup')
+        logger.info('cleanup')
         # stop controller sub process
         for con in controls:
-            con[PIPE].send('quit')
+            con.pipe.send('quit')
             
         for con in controls:
-            con[PROC].proc.join()
+            con.process.proc.join()
             GPIO.cleanup()
-        logging.info('===== done ====')
+        logger.info('===== done ====')
