@@ -13,6 +13,9 @@ from collections import namedtuple
 import RPi.GPIO as GPIO
 from stepper_controller import MotorController
 
+# container for the controllers we create
+Control = namedtuple('Control', 'process pipe')
+
 # stepper sequence exampe.  motor dependent
 # SEQ = [(1,0,0,0),
 #        (0,1,0,0),
@@ -78,14 +81,14 @@ Usage:
 
     def do_EOF(self, line):
         """Exit program"""
-        logging.debug("do EOF")
+        logger.debug("do EOF")
         print()
         return True # to exit the command interpreter loop
 
     def do_fwd(self, args):
         """Go forward N steps"""
         global current
-        logging.debug("*main do_fwd() ")
+        logger.debug("do_fwd() ")
         current.pipe.send('step ' + args)
         print( current.pipe.recv())  # timeout?
 
@@ -95,7 +98,7 @@ Usage:
         """
         for now, we assume controllers are numbered 0, 1, 2
         """
-        logging.debug("do mov: " + args)
+        logger.debug("do mov: " + args)
         try:
             # x_steps, y_steps, z_steps
             steps = [ i for i in shlex.split(args)]
@@ -110,7 +113,7 @@ Usage:
             for con in controls:
                 print(con.pipe.recv())
         except Exception as ex:
-            logging.debug(ex)
+            logger.debug(ex)
         finally:
             return False
         
@@ -184,8 +187,7 @@ Usage:
 
 
 
-# container for the controllers we create
-Control = namedtuple('Control', 'process pipe')
+
 
 #
 # main line
@@ -202,31 +204,19 @@ if __name__ == '__main__':
         # our process id
         logger.info('main pid: %d ',os.getpid())
         
-        
         # create controllers and add to our list of controls
         #  a control consists of a class ref and a pipe
-
-        # fixme : use a Factory
-
         controls = []
-        parent_conn, child_conn = Pipe()  # (parent_conn, child_conn)
-        stepx = MotorController( 'stepx', child_conn, SEQ, XPINS)
-        controls.append(Control(stepx, parent_conn))
-        
-        parent_conn, child_conn = Pipe()  # (parent_conn, child_conn)
-        stepy = MotorController( 'stepy', child_conn, SEQ, YPINS)
-        controls.append(Control(stepy, parent_conn))
-
-        parent_conn, child_conn = Pipe()  # (parent_conn, child_conn)
-        stepz = MotorController( 'stepz', child_conn, SEQ, ZPINS)
-        controls.append(Control(stepz, parent_conn))
-        
+        controls.append(MotorController.Factory('stepx', SEQ, XPINS))
+        controls.append(MotorController.Factory('stepy', SEQ, YPINS))
+        controls.append(MotorController.Factory('stepz', SEQ, ZPINS))
 
         # log controller pids
         for con in controls:
-            logger.info('%s pid: %d', con.process.name, con.process.proc.pid)
+            logger.info('{} pid: {}'.format(con.process.name,
+                                            con.process.proc.pid))
 
-        current = controls[0] # default to first in list
+        current = controls[0]  # default to first in list
 
         # create command interpreter
         prompt = Hello()

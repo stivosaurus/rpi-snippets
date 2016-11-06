@@ -9,33 +9,16 @@ import os
 import time
 import shlex
 import logging
+from collections import namedtuple
 import RPi.GPIO as GPIO
 
 logger = logging.getLogger(__name__)
 
-# def myfunc(conn):
-#     done = False
-#     while not done:
-#         logger.debug('** myfunc waiting...')
-#         msg = conn.recv()
-#         logger.debug('** msg is: %s', msg)
-#         if msg in [None, "quit"]:
-#             logger.debug('** myfunc received quit')
-#             done = True
-#             break
-
-#         time.sleep(2)
-#     #conn.send([42, None, "hello"])
-#     # done
-#     logger.debug("** myfunc exiting")
-#     conn.close()
-#     sys.exit()
-
-
-
+# container for the controllers we create
+Control = namedtuple('Control', 'process pipe')
 
 class MotorController(object):
-    """R-Pi stepper controller.
+    """Raspberry Pi stepper motor controller.
     language:
     step N  - do N rotation steps
     forward - set rotation direction
@@ -43,8 +26,22 @@ class MotorController(object):
     quit    - kill subprocess
     """
 
+    @classmethod
+    def Factory(cls,  # class
+                name,
+                sequence,
+                pins,
+                pulse_time=0.002,
+                wait_time=0.0):
+        """Construct a controller and it's pipe"""
+        parent_end, child_end = Pipe()
+        mc = cls( name, child_end,
+                              sequence, pins,
+                              pulse_time, wait_time)
+        return Control(mc, parent_end)
     
-    def __init__(self, name, conn, seq, pins, pulse_time=0.002):
+    
+    def __init__(self, name, conn, seq, pins, pulse_time=0.002, wait_time=0.0):
         self.name  = name
         self.conn = conn
         self.seq = seq
@@ -62,17 +59,19 @@ class MotorController(object):
             while(runit):
                 # read a command
                 raw_msg = self.conn.recv()
-                logger.debug('raw msg: %s' % raw_msg)
+                logger.debug('{} raw msg: {}'.format(self.name, raw_msg))
                 msg = shlex.split(raw_msg)
                 if msg:
                     logger.debug('%s msg: %s', self.name, msg)
                     if msg[0] == 'quit':
                         break
-                    if msg[0] == 'step':
+                    elif msg[0] == 'step':
                         # step() wants a number, not a string
                         self.step( int(msg[1]) )
-                        logger.debug("%s sending done msg", self.name)
-                self.conn.send('{} i be done'.format(self.name))
+                    else:
+                        logger.info('unrecognized command: {}', msg)
+                logger.debug('%s sending done msg', self.name)
+                self.conn.send('{} be done'.format(self.name))
         except Exception as ex:
             logger.info('%s Caught exeption: %s', self.name, ex)
             GPIO.cleanup(self.pins)
