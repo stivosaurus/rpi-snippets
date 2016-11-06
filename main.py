@@ -7,14 +7,12 @@ import time
 import shlex
 import cmd
 import logging
+import json
 from datetime import datetime
 from collections import namedtuple
 
 import RPi.GPIO as GPIO
 from stepper_controller import MotorController
-
-# container for the controllers we create
-Control = namedtuple('Control', 'process pipe')
 
 # stepper sequence exampe.  motor dependent
 # SEQ = [(1,0,0,0),
@@ -184,7 +182,19 @@ Usage:
             self.use_rawinput = old_use_rawinput
             self.prompt = old_prompt
 
+    def do_inquiry(self, line):
+        """ query values from stepper controller"""
+        global current
 
+        command = 'inquiry ' + json.dumps({ "cmd":"get",
+                                            "args":{'odometer':None,
+                                                    'pulse_time':None,
+                                                    'step_time':None }
+        })
+        current.pipe.send(command)
+
+        reply = current.pipe.recv()
+        print(reply)
 
 
 
