@@ -109,6 +109,7 @@ class MotorController(object):
         for s in range(steps):
             self.toggle_pins(self.pins,
                              self.next_sequence(direction))
+            self.odometer += direction
             time.sleep(float(self.step_time))
 
     
