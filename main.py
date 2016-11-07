@@ -189,6 +189,10 @@ Usage:
         # reply
         print( current.pipe.recv())
         
+    def do_set(self, line):
+        """ set value in controller. set name value"""
+        global current
+        current.pipe.send('set ' + line)
 
 
     # def do_inquiry(self, line):
@@ -226,8 +230,8 @@ if __name__ == '__main__':
         #  a control consists of a class ref and a pipe
         controls = []
         controls.append(MotorController.Factory('stepx', SEQ, XPINS))
-        # controls.append(MotorController.Factory('stepy', SEQ, YPINS))
-        # controls.append(MotorController.Factory('stepz', SEQ, ZPINS))
+        controls.append(MotorController.Factory('stepy', SEQ, YPINS))
+        controls.append(MotorController.Factory('stepz', SEQ, ZPINS))
 
         # log controller pids
         for con in controls:

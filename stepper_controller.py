@@ -83,8 +83,11 @@ class MotorController(object):
                 elif command == 'get':
                     # get value from controller
                     self.get(parsed_msg)  # [get, var-name]
+                elif command == 'set':
+                    # set value in controller
+                    self.set(parsed_msg)  # [set, name, value]
                 else:
-                    logger.info('unrecognized command: {}'.format(msg))
+                    logger.info('unrecognized command: {}'.format(command))
                 # logger.debug('%s sending done msg', self.name)
                 # self.pipe.send('{} done'.format(self.name))
         except Exception as ex:
@@ -106,7 +109,7 @@ class MotorController(object):
         for s in range(steps):
             self.toggle_pins(self.pins,
                              self.next_sequence(direction))
-            time.sleep(self.step_time)
+            time.sleep(float(self.step_time))
 
     
     def toggle_pins( self, pins, seq):
@@ -117,7 +120,7 @@ class MotorController(object):
         for i in zip(pins, seq):
             GPIO.output(i[0], i[1])
         #
-        time.sleep( self.pulse_time)
+        time.sleep(float(self.pulse_time))
         GPIO.output( pins, GPIO.LOW)
 
 
@@ -143,6 +146,13 @@ class MotorController(object):
         reply = '{}: {}'.format(name, value)
         logger.debug(reply)
         self.pipe.send(reply)
+
+    def set(self, parsed_msg):
+        """ set value in controller. syntax: set name value """
+        junk, name, value = parsed_msg
+        setattr(self, name, value)
+    
+        
 
     
     # def inquiry(self, payload):
