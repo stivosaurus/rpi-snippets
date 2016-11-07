@@ -88,7 +88,7 @@ Usage:
         global current
         logger.debug("do_fwd() ")
         current.pipe.send('step ' + args)
-        print( current.pipe.recv())  # timeout?
+        #print( current.pipe.recv())  # timeout?
 
 
     def do_mov(self, args):
@@ -107,9 +107,9 @@ Usage:
             for con, st in zip(controls, steps):
                 con.pipe.send('step ' + st)
 
-            # wait for returns
-            for con in controls:
-                print(con.pipe.recv())
+            # # wait for returns
+            # for con in controls:
+            #     print(con.pipe.recv())
         except Exception as ex:
             logger.debug(ex)
         finally:
@@ -182,20 +182,28 @@ Usage:
             self.use_rawinput = old_use_rawinput
             self.prompt = old_prompt
 
-    def do_inquiry(self, line):
-        """ query values from stepper controller"""
+    def do_get(self, line):
+        """ get value from controller"""
         global current
+        current.pipe.send('get ' + line)
+        # reply
+        print( current.pipe.recv())
+        
 
-        command = 'inquiry ' + json.dumps({ "cmd":"get",
-                                            "args":{'odometer':None,
-                                                    'pulse_time':None,
-                                                    'step_time':None }
-        })
-        current.pipe.send(command)
 
-        reply = current.pipe.recv()
-        print(reply)
+    # def do_inquiry(self, line):
+    #     """ query values from stepper controller"""
+    #     global current
 
+    #     command = 'inquiry ' + json.dumps({ "cmd":"get",
+    #                                         "args":{'odometer':None,
+    #                                                 'pulse_time':None,
+    #                                                 'step_time':None }
+    #     })
+    #     current.pipe.send(command)
+
+    #     reply = current.pipe.recv()
+    #     print(reply)
 
 
 
@@ -218,8 +226,8 @@ if __name__ == '__main__':
         #  a control consists of a class ref and a pipe
         controls = []
         controls.append(MotorController.Factory('stepx', SEQ, XPINS))
-        controls.append(MotorController.Factory('stepy', SEQ, YPINS))
-        controls.append(MotorController.Factory('stepz', SEQ, ZPINS))
+        # controls.append(MotorController.Factory('stepy', SEQ, YPINS))
+        # controls.append(MotorController.Factory('stepz', SEQ, ZPINS))
 
         # log controller pids
         for con in controls:

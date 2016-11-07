@@ -65,24 +65,28 @@ class MotorController(object):
                 # read a command
                 raw_msg = self.pipe.recv()
                 logger.debug('{} raw msg: {}'.format(self.name, raw_msg))
-                msg = shlex.split(raw_msg)
-                logger.debug('{} msg: {}'.format( self.name, msg))
-                if not msg:
+                parsed_msg = shlex.split(raw_msg) # [command, arg1, arg2...] 
+                logger.debug('{} parsed msg: {}'.format( self.name, parsed_msg))
+                #
+                if not parsed_msg:
                     continue
-                command = msg[0]
+                command = parsed_msg[0]
                 if command == 'quit':
                     break
                 elif command == 'step':
                     # step() wants a number, not a string
-                    self.step( int(msg[1]) )
-                elif command == 'inquiry':
-                    print('doing inquiry')
-                    cmd, payload = raw_msg.split(' ', 1) # split at first blank
-                    self.inquiry(payload)
+                    self.step( int(parsed_msg[1]) )
+                # elif command == 'inquiry':
+                #     print('doing inquiry')
+                #     cmd, payload = raw_msg.split(' ', 1) # split at first blank
+                #     self.inquiry(payload)
+                elif command == 'get':
+                    # get value from controller
+                    self.get(parsed_msg)  # [get, var-name]
                 else:
                     logger.info('unrecognized command: {}'.format(msg))
-                logger.debug('%s sending done msg', self.name)
-                self.pipe.send('{} be done'.format(self.name))
+                # logger.debug('%s sending done msg', self.name)
+                # self.pipe.send('{} done'.format(self.name))
         except Exception as ex:
             logger.info('%s Caught exeption: %s', self.name, ex)
             GPIO.cleanup(self.pins)
@@ -130,23 +134,29 @@ class MotorController(object):
             self.next = 0
         seq = self.seq[self.next]
         return seq
+    
+    
+    def get(self, parsed_msg):
+        """return value of a member variable"""
+        name = parsed_msg[1]
+        value = getattr(self, name, None)
+        reply = '{}: {}'.format(name, value)
+        logger.debug(reply)
+        self.pipe.send(reply)
 
-
-    def send(self, msg):
-        self.pipe.send(msg)
-
-    def inquiry(self, payload):
-        """ return values for variables in payload"""
-        # payload is json dict in string format with {command:name, args:{}}
-        # args is a dict with member names as key, None as value
-        command_args = json.loads(payload)
-        my_command = command_args['cmd']
-        my_args = command_args['args']
-        # lookup attribute in class via getattr. not found is None
-        for k in my_args.keys():
-            my_args[k] = getattr(self, k, None)
-        # reply
-        self.pipe.send(json.dumps(my_args))
+    
+    # def inquiry(self, payload):
+    #     """ return values for variables in payload"""
+    #     # payload is json dict in string format with {command:name, args:{}}
+    #     # args is a dict with member names as key, None as value
+    #     command_args = json.loads(payload)
+    #     my_command = command_args['cmd']
+    #     my_args = command_args['args']
+    #     # lookup attribute in class via getattr. not found is None
+    #     for k in my_args.keys():
+    #         my_args[k] = getattr(self, k, None)
+    #     # reply
+    #     self.pipe.send(json.dumps(my_args))
         
     
 
