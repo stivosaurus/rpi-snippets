@@ -77,6 +77,16 @@ def draw_triangle(coords, direction):
         if triangle.collidepoint(pygame.mouse.get_pos()) and event.type == pygame.MOUSEBUTTONDOWN:
             triangle = pygame.draw.polygon(screen, BLUE, coords, 2)
             x_speed = direction
+            
+            
+def ok_button():
+    okbutton = pygame.draw.ellipse(screen, WHITE, [140, 60, 80, 80], 2) 
+    if okbutton.collidepoint(pygame.mouse.get_pos()):
+        okbutton = pygame.draw.ellipse(screen, RED, [140, 60, 80, 80], 2)         
+        if okbutton.collidepoint(pygame.mouse.get_pos()) and event.type == pygame.MOUSEBUTTONDOWN:
+            okbutton = pygame.draw.ellipse(screen, BLUE, [140, 60, 80, 80], 2)         
+            
+            
 
     #triangle3 = pygame.draw.polygon(screen, WHITE, [[220, 140], [140, 140],[220,60]], 2)
 # Setup
@@ -156,7 +166,6 @@ while not done:
                 y_speed = 0
  
     # --- Game Logic
- 
     # Move the object according to the speed vector.
     x_coord = x_coord + x_speed
     y_coord = y_coord + y_speed
@@ -203,6 +212,7 @@ while not done:
     #draw_triangle([[260, 100], [220, 140],[220, 60]], -1)
     draw_triangle([[140, 60], [220,60],[180,20]], 1)
     draw_triangle([[220, 140], [140, 140],[180, 180]], -1)
+    ok_button()
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
  
