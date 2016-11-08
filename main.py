@@ -192,23 +192,20 @@ Usage:
     def do_set(self, line):
         """ set value in controller. set name value"""
         global current
-        current.pipe.send('set ' + line)
+        try:
+            if len(line.split(' ')) != 2:
+                   raise ValueError
+            current.pipe.send('set ' + line)
+            print(current.pipe.recv())
+        except ValueError:
+            print('wrong number of args')
 
-
-    # def do_inquiry(self, line):
-    #     """ query values from stepper controller"""
-    #     global current
-
-    #     command = 'inquiry ' + json.dumps({ "cmd":"get",
-    #                                         "args":{'odometer':None,
-    #                                                 'pulse_time':None,
-    #                                                 'step_time':None }
-    #     })
-    #     current.pipe.send(command)
-
-    #     reply = current.pipe.recv()
-    #     print(reply)
-
+            
+    def do_junk(self,line):
+        """ send some junk to controller for testing"""
+        global current
+        current.pipe.send('foo bar asdfdsf')
+        
 
 
 #

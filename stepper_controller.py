@@ -12,6 +12,7 @@ import RPi.GPIO as GPIO
 import shlex
 import sys
 import time
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -59,46 +60,32 @@ class MotorController(object):
     #
     def run(self):
         try:
-            #logger.debug('in run()')
             runit = True
             while(runit):
-                # read a command
-                raw_msg = self.pipe.recv()
-                logger.debug('{} raw msg: {}'.format(self.name, raw_msg))
-                parsed_msg = shlex.split(raw_msg) # [command, arg1, arg2...] 
-                logger.debug('{} parsed msg: {}'.format( self.name, parsed_msg))
-                #
-                if not parsed_msg:
-                    continue
-                command = parsed_msg[0]
-                if command == 'quit':
-                    break
-                elif command == 'step':
-                    # step() wants a number, not a string
-                    self.step( int(parsed_msg[1]) )
-                # elif command == 'inquiry':
-                #     print('doing inquiry')
-                #     cmd, payload = raw_msg.split(' ', 1) # split at first blank
-                #     self.inquiry(payload)
-                elif command == 'get':
-                    # get value from controller
-                    self.get(parsed_msg)  # [get, var-name]
-                elif command == 'set':
-                    # set value in controller
-                    self.set(parsed_msg)  # [set, name, value]
+                # read a command. append a space for easier parsing
+                raw_msg = self.pipe.recv() + ' '
+                cmd, rest = raw_msg.split(' ', 1)  # split off command
+                logger.debug('{} msg: {}, {}'.format( self.name,
+                                                      cmd, rest))
+                try:
+                    func = getattr(self, 'do_' + cmd)
+                except AttributeError:
+                    logger.info('{}: no such command: {}'.format( self.name,
+                                                                  cmd))
                 else:
-                    logger.info('unrecognized command: {}'.format(command))
-                # logger.debug('%s sending done msg', self.name)
-                # self.pipe.send('{} done'.format(self.name))
+                    func(rest)
         except Exception as ex:
             logger.info('%s Caught exeption: %s', self.name, ex)
+            traceback.print_exc()
+            print()
+        finally:
+            logger.debug('finally!')
             GPIO.cleanup(self.pins)
-            raise ex
-            sys.exit()
 
 
-    def step(self, steps):
-        """cycle motor steps number of steps"""
+    def do_step(self, line):
+        """cycle motor steps number of steps.  syntax: step N"""
+        steps = int(line)
         logger.info("%s step %d", self.name, steps)
         if steps < 0:
             direction = -1
@@ -139,39 +126,33 @@ class MotorController(object):
         seq = self.seq[self.next]
         return seq
     
+    def do_quit(self, line):
+        """ we're done! """
+        # pin cleanup happens in finally clause of run()
+        sys.exit()
     
-    def get(self, parsed_msg):
+    
+    def do_get(self, line):
         """return value of a member variable"""
-        name = parsed_msg[1]
+        name = shlex.split(line)[0]
         value = getattr(self, name, None)
         reply = '{}: {}'.format(name, value)
         logger.debug(reply)
         self.pipe.send(reply)
 
-    def set(self, parsed_msg):
+    def do_set(self, line):
         """ set value in controller. syntax: set name value """
-        junk, name, value = parsed_msg
-        setattr(self, name, value)
-    
-        
-
-    
-    # def inquiry(self, payload):
-    #     """ return values for variables in payload"""
-    #     # payload is json dict in string format with {command:name, args:{}}
-    #     # args is a dict with member names as key, None as value
-    #     command_args = json.loads(payload)
-    #     my_command = command_args['cmd']
-    #     my_args = command_args['args']
-    #     # lookup attribute in class via getattr. not found is None
-    #     for k in my_args.keys():
-    #         my_args[k] = getattr(self, k, None)
-    #     # reply
-    #     self.pipe.send(json.dumps(my_args))
-        
-    
-
-
-
+        name, value = line.split()
+        logger.debug('{}: {}'.format(name, value))
+        try:
+            # does it exist? then set it
+            getattr(self, name) 
+            setattr(self, name, value)  
+            reply = 'OK'
+        except AttributeError:
+            reply = 'invalid attribute: {}'.format(name)
+            logger.debug(reply)
+        finally:
+            self.pipe.send(reply)
 
 
