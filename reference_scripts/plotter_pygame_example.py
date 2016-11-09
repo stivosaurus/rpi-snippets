@@ -14,6 +14,10 @@ LIGHTGRAY = (212, 208, 200)
 MOUSE_LEFT = 1  # adding variables for left and right
 MOUSE_RIGHT = 3  # mouse clicks see code left_right_mouse.py
 # in references
+LEFT = 0
+RIGHT = 1
+UP = 2
+DOWN = 3
 
 
 def end_program():
@@ -114,11 +118,13 @@ def draw_button(screen, text, coords, action=0):
 
 def draw_triangle(coords, direction):
     axis_direction = [('left'), ('right'), ('up'), ('down')]
+    triangle = pygame.draw.polygon(screen, LIGHTGRAY, coords, 0)
     triangle = pygame.draw.polygon(screen, WHITE, coords, 2)
     if triangle.collidepoint(pygame.mouse.get_pos()):
-        triangle = pygame.draw.polygon(screen, RED, coords, 2)
+        triangle = pygame.draw.polygon(screen, DARKGRAY, coords, 2)
         if triangle.collidepoint(pygame.mouse.get_pos(
         )) and event.type == pygame.MOUSEBUTTONDOWN and event.button == MOUSE_LEFT:
+            triangle = pygame.draw.polygon(screen, GRAY, coords, 0)
             triangle = pygame.draw.polygon(screen, BLUE, coords, 2)
             # do_command(axis_direction[direction])
             print axis_direction[direction]
@@ -127,12 +133,14 @@ def draw_triangle(coords, direction):
 
 
 def ok_button():
+    okbutton = pygame.draw.ellipse(screen, GRAY, [140, 60, 80, 80], 0)
+    okbutton = pygame.draw.ellipse(screen, LIGHTGRAY, [145, 65, 70, 70], 0)
     okbutton = pygame.draw.ellipse(screen, WHITE, [140, 60, 80, 80], 2)
     if okbutton.collidepoint(pygame.mouse.get_pos()):
-        okbutton = pygame.draw.ellipse(screen, RED, [140, 60, 80, 80], 2)
+        okbutton = pygame.draw.ellipse(screen, DARKGRAY, [140, 60, 80, 80], 5)
         if okbutton.collidepoint(pygame.mouse.get_pos(
         )) and event.type == pygame.MOUSEBUTTONDOWN and event.button == MOUSE_LEFT:
-            okbutton = pygame.draw.ellipse(screen, BLUE, [140, 60, 80, 80], 2)
+            okbutton = pygame.draw.ellipse(screen, BLUE, [140, 60, 80, 80], 5)
             print 'ok'
 
 #triangle3 = pygame.draw.polygon(screen, WHITE, [[220, 140], [140, 140],[220,60]], 2)
@@ -245,13 +253,13 @@ while not done:
     # TODO fix the action function for the buttons
     pos = 30
     Button_text = [
-        'exit',
-        'button',
+        'Exit',
+        'Save',
         'Get File',
-        'button3',
-        'button4',
-        'button5',
-        'button6',
+        'Circle',
+        'Line',
+        'Rectangle',
+        'Arc',
         'button7',
         'button8',
         'button9',
@@ -262,11 +270,8 @@ while not done:
     # TODO add the method to talk to the stepper controller or to main
     # added a for loop in button actions
     for i in range(len(Button_text)):
-        draw_button(screen, Button_text[i], (20, 150 + pos * i, 80, 20), Action[i])
-    LEFT = 0
-    RIGHT = 1
-    UP = 2
-    DOWN = 3
+        draw_button(screen, Button_text[i], (20, 150 + pos * i, 90, 20), Action[i])
+
     draw_triangle([[100, 100], [140, 140], [140, 60]], LEFT)
     draw_triangle([[260, 100], [220, 140], [220, 60]], RIGHT)
     #draw_triangle([[260, 100], [220, 140],[220, 60]], 2)
