@@ -1,6 +1,6 @@
 #!/usr/bin/python2
 
-from multiprocessing import Process, Pipe
+from multiprocessing import Pipe
 import sys
 import os
 import time
@@ -25,35 +25,33 @@ from stepper_controller import MotorController
 #        (0,0,0,1)]
 
 # for Berg's particular stepper
-SEQ = [(1,0,0,1),
-       (1,0,0,0),
-       (1,1,0,0),
-       (0,1,0,0),
-       (0,1,1,0),
-       (0,0,1,0),
-       (0,0,1,1),
-       (0,0,0,1)]
+SEQ = [(1, 0, 0, 1),
+       (1, 0, 0, 0),
+       (1, 1, 0, 0),
+       (0, 1, 0, 0),
+       (0, 1, 1, 0),
+       (0, 0, 1, 0),
+       (0, 0, 1, 1),
+       (0, 0, 0, 1)]
 
 #
 # define pins and initialize low
 #
 GPIO.setmode(GPIO.BOARD)
-GPIO.setwarnings(False) 
-XPINS = [13,15,16,18]
-YPINS = [37,33,31,29]
+GPIO.setwarnings(False)
+XPINS = [13, 15, 16, 18]
+YPINS = [37, 33, 31, 29]
 ZPINS = [32, 36, 38, 40]
 GPIO.setup(XPINS + YPINS + ZPINS,
            GPIO.OUT,
            initial=GPIO.LOW)
 
-# command interpreter class
 
 class Hello(cmd.Cmd):
     """ simple command processor """
 
     # def __init__(self):
     #     cmd.Cmd.__init__(self)
-    
 
     # printed at start of lopo
     intro = """
@@ -72,24 +70,23 @@ Usage:
     #     """ stuff done after *each* command """
     #     pass
 
-
     def do_exit(self, line):
         """ exit program"""
-        return self.do_EOF( line)
+        return self.do_EOF(line)
 
     def do_EOF(self, line):
         """Exit program"""
         logger.debug("do EOF")
         print()
-        return True # to exit the command interpreter loop
+        return True  # to exit the command interpreter loop
 
     def do_fwd(self, args):
         """Go forward N steps"""
         global current
         logger.debug("do_fwd() ")
         current.pipe.send('step ' + args)
-        #print( current.pipe.recv())  # timeout?
-
+        # do we need a status return here?
+        # print(current.pipe.recv())
 
     def do_mov(self, args):
         """ move X Y Z  steps """
@@ -99,7 +96,7 @@ Usage:
         logger.debug("do mov: " + args)
         try:
             # x_steps, y_steps, z_steps
-            steps = [ i for i in shlex.split(args)]
+            steps = [i for i in shlex.split(args)]
             if len(steps) != 3:
                 raise ValueError("wrong number of args")
 
@@ -114,18 +111,16 @@ Usage:
             logger.debug(ex)
         finally:
             return False
-        
-        
+
     def do_rev(self, args):
         """NOT IMPLEMENTED"""
-        print( ' NOT IMPL rev ' + args)
+        print(' NOT IMPL rev ' + args)
 
     def do_list(self, args):
         """ list available controllers"""
         li = [n.process.name for n in controls]
         for i, name in enumerate(li):
             print(i, name)
-
 
     def do_use(self, arg):
         """ Use controller N from list"""
@@ -134,14 +129,13 @@ Usage:
             val = int(arg)
             if 0 <= val < len(controls):
                 current = controls[val]
-                prompt.prompt = ('%s > ' ) % current.process.name
+                prompt.prompt = ('%s > ') % current.process.name
                 print('using controller %s' % current.process.name)
             else:
                 print('bad value for %d' % val)
         except ValueError:
             print('bad arg for use')
             pass
-        
 
     def do_current(self, line):
         """Show name of current controller"""
@@ -158,7 +152,7 @@ Usage:
         global current
 
         parsed = shlex.split(line)
-        #save state
+        # save state
         old_use_rawinput = self.use_rawinput
         old_prompt = self.prompt
 
@@ -172,7 +166,7 @@ Usage:
             # for li in lines:
             #     self.onecmd(li)  # execute single command
             # stuff contents of file into command loop
-            self.cmdqueue = lines  
+            self.cmdqueue = lines
         except Exception as ex:
             print(ex)
             raise ex
@@ -187,26 +181,23 @@ Usage:
         global current
         current.pipe.send('get ' + line)
         # reply
-        print( current.pipe.recv())
-        
+        print(current.pipe.recv())
+
     def do_set(self, line):
         """ set value in controller. set name value"""
         global current
         try:
             if len(line.split(' ')) != 2:
-                   raise ValueError
+                raise ValueError
             current.pipe.send('set ' + line)
             print(current.pipe.recv())
         except ValueError:
             print('wrong number of args')
 
-            
-    def do_junk(self,line):
+    def do_junk(self, line):
         """ send some junk to controller for testing"""
         global current
         current.pipe.send('foo bar asdfdsf')
-        
-
 
 #
 # main line
@@ -216,13 +207,13 @@ if __name__ == '__main__':
     try:
         # set up logging
         logging.basicConfig(filename='stepper.log',
-                            level = logging.DEBUG)
+                            level=logging.DEBUG)
         logger = logging.getLogger(__name__)
-        logger.info("Start: %s", datetime.now() )
+        logger.info("Start: %s", datetime.now())
 
         # our process id
-        logger.info('main pid: %d ',os.getpid())
-        
+        logger.info('main pid: %d ', os.getpid())
+
         # create controllers and add to our list of controls
         #  a control consists of a class ref and a pipe
         controls = []
@@ -239,7 +230,7 @@ if __name__ == '__main__':
 
         # create command interpreter
         prompt = Hello()
-        
+
         # put current controller name in prompt
         prompt.prompt = "%s > " % current.process.name
 
@@ -254,7 +245,7 @@ if __name__ == '__main__':
         # stop controller sub process
         for con in controls:
             con.pipe.send('quit')
-            
+
         for con in controls:
             con.process.proc.join()
             GPIO.cleanup()
