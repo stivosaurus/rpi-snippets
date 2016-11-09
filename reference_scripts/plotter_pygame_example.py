@@ -1,5 +1,5 @@
 import pygame
-import sys
+import sys, os
 from pygame.locals import *
 # Define some colors
 BLACK = (0, 0, 0)
@@ -50,6 +50,8 @@ def draw_screen_boarder(screen):
     pygame.draw.rect(screen,LIGHTGRAY,(300,100,700,500),2)
     
 def draw_button(screen, text, coords, action = 0):
+    #command list for actions maybe use sys or os
+    command = ['exit()', 'donothing', 'donothing', 'donothing', 'donothing', 'donothing', 'donothing', 'donothing', 'donothing', 'donothing', 'donothing', 'donothing', 'donothing']
     button=pygame.draw.rect(screen,LIGHTGRAY,coords,0)
     button=pygame.draw.rect(screen,BLUE,coords,2)
     screen.blit(buttonfont.render(text, True, (0,0,0)), (coords[0]+5, coords[1]))
@@ -62,9 +64,8 @@ def draw_button(screen, text, coords, action = 0):
             button=pygame.draw.rect(screen,DARKGRAY,coords,0)
             button=pygame.draw.rect(screen,BLUE,coords,2)
             screen.blit(buttonfont.render(text, True, (RED)), (coords[0]+5, coords[1]))
-            print action
+            print command[action]
             
-            print action
         else:
             pass
             
