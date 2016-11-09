@@ -11,6 +11,9 @@ RED = (255, 0, 0)
 DARKGRAY = (64, 64, 64)
 GRAY = (128, 128, 128)
 LIGHTGRAY = (212, 208, 200)
+MOUSE_LEFT = 1  # adding variables for left and right
+MOUSE_RIGHT = 3  # mouse clicks see code left_right_mouse.py
+# in references
 
 
 def end_program():
@@ -27,10 +30,10 @@ def show_pointer_coords(screen, x, y):
 
 
 def show_x_y(screen, x, y):
-    coord = myfont.render("coords = %i %i" % (x - 300, y - 100), 2, BLUE)
-    screen.blit(coord, (105, 5))
-    coord = myfont.render("coords = %i %i" % (x - 300, y - 100), 2, WHITE)
-    screen.blit(coord, (106, 6))
+    coord = myfont.render("Coords = X-%i Y-%i" % (x - 300, y - 100), 3, BLUE)
+    screen.blit(coord, (115, 5))
+    coord = myfont.render("Coords = X-%i Y-%i" % (x - 300, y - 100), 2, WHITE)
+    screen.blit(coord, (116, 6))
     credit = myfont.render("By Stiv & Berg", 3, BLUE)
     screen.blit(credit, (20, 580))
     credit = myfont.render("By Stiv & Berg", 3, WHITE)
@@ -54,11 +57,11 @@ def mouse_pos(screen):
         mouse_pos = myfont.render(
             "Mouse Position = %i %i" %
             (mousex - 300, mousey - 100), 3, BLUE)
-        screen.blit(mouse_pos, (290, 5))
+        screen.blit(mouse_pos, (350, 5))
         mouse_pos = myfont.render(
             "Mouse Position = %i %i" %
             (mousex - 300, mousey - 100), 3, WHITE)
-        screen.blit(mouse_pos, (291, 6))
+        screen.blit(mouse_pos, (351, 6))
 
 
 def draw_screen_boarder(screen):
@@ -67,6 +70,7 @@ def draw_screen_boarder(screen):
 
 def draw_button(screen, text, coords, action=0):
     # command list for actions maybe use sys or os
+
     command = [
         'exit()',
         'donothing',
@@ -91,18 +95,21 @@ def draw_button(screen, text, coords, action=0):
 
         screen.blit(buttonfont.render(text, True, (200, 200, 200)),
                     (coords[0] + 5, coords[1]))
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        # adding left and right mouse button test if elif
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == MOUSE_LEFT:
             button = pygame.draw.rect(screen, DARKGRAY, coords, 0)
             button = pygame.draw.rect(screen, BLUE, coords, 2)
             screen.blit(buttonfont.render(text, True, (RED)),
                         (coords[0] + 5, coords[1]))
             print command[action]
 
-        else:
-            pass
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == MOUSE_RIGHT:
+            print 'right'
 
     else:
         pass
+
+# ADDED left mouse click
 
 
 def draw_triangle(coords, direction):
@@ -111,10 +118,12 @@ def draw_triangle(coords, direction):
     if triangle.collidepoint(pygame.mouse.get_pos()):
         triangle = pygame.draw.polygon(screen, RED, coords, 2)
         if triangle.collidepoint(pygame.mouse.get_pos(
-        )) and event.type == pygame.MOUSEBUTTONDOWN:
+        )) and event.type == pygame.MOUSEBUTTONDOWN and event.button == MOUSE_LEFT:
             triangle = pygame.draw.polygon(screen, BLUE, coords, 2)
             # do_command(axis_direction[direction])
             print axis_direction[direction]
+
+# ADDED left mouse click
 
 
 def ok_button():
@@ -122,11 +131,11 @@ def ok_button():
     if okbutton.collidepoint(pygame.mouse.get_pos()):
         okbutton = pygame.draw.ellipse(screen, RED, [140, 60, 80, 80], 2)
         if okbutton.collidepoint(pygame.mouse.get_pos(
-        )) and event.type == pygame.MOUSEBUTTONDOWN:
+        )) and event.type == pygame.MOUSEBUTTONDOWN and event.button == MOUSE_LEFT:
             okbutton = pygame.draw.ellipse(screen, BLUE, [140, 60, 80, 80], 2)
             print 'ok'
 
-    #triangle3 = pygame.draw.polygon(screen, WHITE, [[220, 140], [140, 140],[220,60]], 2)
+#triangle3 = pygame.draw.polygon(screen, WHITE, [[220, 140], [140, 140],[220,60]], 2)
 # Setup
 pygame.init()
 
@@ -194,7 +203,7 @@ while not done:
                 # do nothing
                 pass
             else:
-                x_coord = mouseXpip install pep8
+                x_coord = mouseX
                 y_coord = mouseY
                 print mouseX, mouseY
 
@@ -238,7 +247,7 @@ while not done:
     Button_text = [
         'exit',
         'button',
-        'button2',
+        'Get File',
         'button3',
         'button4',
         'button5',
@@ -253,7 +262,7 @@ while not done:
     # TODO add the method to talk to the stepper controller or to main
     # added a for loop in button actions
     for i in range(len(Button_text)):
-        draw_button(screen, Button_text[i], (20, pos * i, 70, 20), Action[i])
+        draw_button(screen, Button_text[i], (20, 150 + pos * i, 80, 20), Action[i])
     LEFT = 0
     RIGHT = 1
     UP = 2
