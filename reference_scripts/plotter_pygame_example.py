@@ -49,20 +49,21 @@ def mouse_pos(screen):
 def draw_screen_boarder(screen):
     pygame.draw.rect(screen,LIGHTGRAY,(300,100,700,500),2)
     
-def draw_button1(screen, text, coords, action = do_nothing()):
-    button1=pygame.draw.rect(screen,LIGHTGRAY,coords,0)
-    button1=pygame.draw.rect(screen,BLUE,coords,2)
+def draw_button(screen, text, coords, action = do_nothing()):
+    button=pygame.draw.rect(screen,LIGHTGRAY,coords,0)
+    button=pygame.draw.rect(screen,BLUE,coords,2)
     screen.blit(buttonfont.render(text, True, (0,0,0)), (coords[0]+5, coords[1]))
-    if button1.collidepoint(pygame.mouse.get_pos()):
-        button1=pygame.draw.rect(screen,GRAY,coords,0)
-        button1=pygame.draw.rect(screen,WHITE,coords,2)
+    if button.collidepoint(pygame.mouse.get_pos()):
+        button=pygame.draw.rect(screen,GRAY,coords,0)
+        button=pygame.draw.rect(screen,WHITE,coords,2)
         
         screen.blit(buttonfont.render(text, True, (200,200,200)), (coords[0]+5, coords[1]))
         if event.type == pygame.MOUSEBUTTONDOWN:
-            button1=pygame.draw.rect(screen,DARKGRAY,coords,0)
-            button1=pygame.draw.rect(screen,BLUE,coords,2)
+            button=pygame.draw.rect(screen,DARKGRAY,coords,0)
+            button=pygame.draw.rect(screen,BLUE,coords,2)
             screen.blit(buttonfont.render(text, True, (RED)), (coords[0]+5, coords[1]))
-            action
+            
+            print action
         else:
             pass
             
@@ -71,13 +72,14 @@ def draw_button1(screen, text, coords, action = do_nothing()):
 
 
 def draw_triangle(coords, direction):
+    axis_direction = [('use 0', -1), ('use 0', 1), ('use 1', -1), ('use 1', 1)]
     triangle = pygame.draw.polygon(screen, WHITE, coords, 2)
     if triangle.collidepoint(pygame.mouse.get_pos()):
         triangle = pygame.draw.polygon(screen, RED, coords, 2)
         if triangle.collidepoint(pygame.mouse.get_pos()) and event.type == pygame.MOUSEBUTTONDOWN:
             triangle = pygame.draw.polygon(screen, BLUE, coords, 2)
-            x_speed = direction
-            
+            #do_command(axis_direction[direction])
+            print axis_direction[direction]
             
 def ok_button():
     okbutton = pygame.draw.ellipse(screen, WHITE, [140, 60, 80, 80], 2) 
@@ -193,25 +195,17 @@ while not done:
     mouse_pos(screen)
     draw_screen_boarder(screen)
     #TODO fix the action function for the buttons
-    
-    draw_button1(screen, 'exit', (20,30,60,20), do_nothing())
-    draw_button1(screen, 'test1', (20,60,60,20), do_nothing())
-    draw_button1(screen, 'exit1', (20,90,60,20), do_nothing())
-    draw_button1(screen, 'exit2', (20,120,60,20), do_nothing())
-    draw_button1(screen, 'test3', (20,150,60,20), do_nothing())
-    draw_button1(screen, 'exit4', (20,180,60,20), do_nothing())
-    draw_button1(screen, 'exit5', (20,210,60,20), do_nothing())
-    draw_button1(screen, 'test6', (20,240,60,20), do_nothing())
-    draw_button1(screen, 'exit7', (20,270,60,20), do_nothing())
-    draw_button1(screen, 'exit8', (20,300,60,20), do_nothing())
-    draw_button1(screen, 'test9', (20,330,60,20), do_nothing())
-    draw_button1(screen, 'exit0', (20,360,60,20), do_nothing())
-    draw_button1(screen, 'exit11', (20,390,60,20), do_nothing())
-    draw_triangle([[100, 100], [140, 140],[140, 60]], -1)
+    pos = 30
+    Button_text = ['exit', 'button', 'button2', 'button3', 'button4', 'button5', 'button6', 'button7', 'button8', 'button9', 'button0', 'button1']
+    #added a for loop in button actions
+    for i in range(len(Button_text)):
+        draw_button(screen, Button_text[i], (20,pos*i,70,20), i)
+
+    draw_triangle([[100, 100], [140, 140],[140, 60]], 0)
     draw_triangle([[260, 100], [220, 140],[220, 60]], 1)
-    #draw_triangle([[260, 100], [220, 140],[220, 60]], -1)
-    draw_triangle([[140, 60], [220,60],[180,20]], 1)
-    draw_triangle([[220, 140], [140, 140],[180, 180]], -1)
+    #draw_triangle([[260, 100], [220, 140],[220, 60]], 2)
+    draw_triangle([[140, 60], [220,60],[180,20]], 2)
+    draw_triangle([[220, 140], [140, 140],[180, 180]], 3)
     ok_button()
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
