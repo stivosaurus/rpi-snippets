@@ -20,9 +20,9 @@ def show_pointer_coords(screen, x, y):
     
 def show_x_y(screen, x, y):
     coord = myfont.render("coords = %i %i"%(x - 300, y - 100), 2,BLUE)
-    screen.blit(coord, (5, 5))
+    screen.blit(coord, (105, 5))
     coord = myfont.render("coords = %i %i"%(x - 300, y - 100), 2,WHITE)
-    screen.blit(coord, (6, 6))    
+    screen.blit(coord, (106, 6))    
     credit = myfont.render("By Stiv & Berg",3, BLUE)
     screen.blit(credit, (20, 580))
     credit = myfont.render("By Stiv & Berg",3, WHITE)
@@ -49,7 +49,7 @@ def mouse_pos(screen):
 def draw_screen_boarder(screen):
     pygame.draw.rect(screen,LIGHTGRAY,(300,100,700,500),2)
     
-def draw_button(screen, text, coords, action = do_nothing()):
+def draw_button(screen, text, coords, action = 0):
     button=pygame.draw.rect(screen,LIGHTGRAY,coords,0)
     button=pygame.draw.rect(screen,BLUE,coords,2)
     screen.blit(buttonfont.render(text, True, (0,0,0)), (coords[0]+5, coords[1]))
@@ -62,6 +62,7 @@ def draw_button(screen, text, coords, action = do_nothing()):
             button=pygame.draw.rect(screen,DARKGRAY,coords,0)
             button=pygame.draw.rect(screen,BLUE,coords,2)
             screen.blit(buttonfont.render(text, True, (RED)), (coords[0]+5, coords[1]))
+            print action
             
             print action
         else:
@@ -72,7 +73,7 @@ def draw_button(screen, text, coords, action = do_nothing()):
 
 
 def draw_triangle(coords, direction):
-    axis_direction = [('use 0', -1), ('use 0', 1), ('use 1', -1), ('use 1', 1)]
+    axis_direction = [('left'), ('right'), ('up'), ('down')]
     triangle = pygame.draw.polygon(screen, WHITE, coords, 2)
     if triangle.collidepoint(pygame.mouse.get_pos()):
         triangle = pygame.draw.polygon(screen, RED, coords, 2)
@@ -86,7 +87,8 @@ def ok_button():
     if okbutton.collidepoint(pygame.mouse.get_pos()):
         okbutton = pygame.draw.ellipse(screen, RED, [140, 60, 80, 80], 2)         
         if okbutton.collidepoint(pygame.mouse.get_pos()) and event.type == pygame.MOUSEBUTTONDOWN:
-            okbutton = pygame.draw.ellipse(screen, BLUE, [140, 60, 80, 80], 2)         
+            okbutton = pygame.draw.ellipse(screen, BLUE, [140, 60, 80, 80], 2)
+            print 'ok'         
             
             
 
@@ -196,16 +198,21 @@ while not done:
     draw_screen_boarder(screen)
     #TODO fix the action function for the buttons
     pos = 30
-    Button_text = ['exit', 'button', 'button2', 'button3', 'button4', 'button5', 'button6', 'button7', 'button8', 'button9', 'button0', 'button1']
+    Button_text = ['exit', 'button', 'button2', 'button3', 'button4', 'button5', 'button6', 'button7', 'button8', 'button9', 'button0', 'button1'] #these are the text for the buttons
+    Action = [0,1,2,3,4,5,6,7,8,9,10,11,12] #these are the function keys for the buttons
+    #TODO add the method to talk to the stepper controller or to main
     #added a for loop in button actions
     for i in range(len(Button_text)):
-        draw_button(screen, Button_text[i], (20,pos*i,70,20), i)
-
-    draw_triangle([[100, 100], [140, 140],[140, 60]], 0)
-    draw_triangle([[260, 100], [220, 140],[220, 60]], 1)
+        draw_button(screen, Button_text[i], (20,pos*i,70,20), Action[i])
+    LEFT = 0
+    RIGHT = 1
+    UP = 2
+    DOWN = 3
+    draw_triangle([[100, 100], [140, 140],[140, 60]], LEFT)
+    draw_triangle([[260, 100], [220, 140],[220, 60]], RIGHT)
     #draw_triangle([[260, 100], [220, 140],[220, 60]], 2)
-    draw_triangle([[140, 60], [220,60],[180,20]], 2)
-    draw_triangle([[220, 140], [140, 140],[180, 180]], 3)
+    draw_triangle([[140, 60], [220,60],[180,20]], UP)
+    draw_triangle([[220, 140], [140, 140],[180, 180]], DOWN)
     ok_button()
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()

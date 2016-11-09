@@ -1,0 +1,12 @@
+Metadata-Version: 1.1
+Name: clickndrag
+Version: 0.4.1
+Summary: Click'n'Drag - A Hierarchical Surface Framework for Pygame
+Home-page: http://florian-berger.de/software/clickndrag/
+Author: Florian Berger
+Author-email: fberger@florian-berger.de
+License: GPL
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires: pygame (>=1.9.1)
+Provides: clickndrag
