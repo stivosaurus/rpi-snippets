@@ -1,4 +1,4 @@
-""" Stepper_controller.py
+""" motor_controller.py
 
 Stepper motor controller for Raspberry Pi 
 n"""
@@ -20,12 +20,10 @@ logger = logging.getLogger(__name__)
 Control = namedtuple('Control', 'process pipe')
 
 
-class MotorController(object):
+class StepperController(object):
     """Raspberry Pi stepper motor controller.
     language:
     step N  - do N rotation steps
-    forward - set rotation direction
-    reverse - set rotation direction
     quit    - kill subprocess
     """
 
@@ -141,10 +139,13 @@ class MotorController(object):
         name, value = line.split()
         logger.debug('{}: {}'.format(name, value))
         try:
+            reply = 'OK'
             # does it exist? then set it
+            if name == 'name':
+                reply = 'read-only property'
+                raise AttributeError
             getattr(self, name)
             setattr(self, name, value)
-            reply = 'OK'
         except AttributeError:
             reply = 'invalid attribute: {}'.format(name)
             logger.debug(reply)
