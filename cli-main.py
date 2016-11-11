@@ -15,7 +15,7 @@ import RPi.GPIO as GPIO
 from motor_controller import StepperController
 import hello
 
-# stepper sequence exampe.  motor dependent
+# stepper sequence example.  motor dependent
 # SEQ = [(1,0,0,0),
 #        (0,1,0,0),
 #        (1,1,0,0),
@@ -35,18 +35,13 @@ SEQ = [(1, 0, 0, 1),
        (0, 0, 1, 1),
        (0, 0, 0, 1)]
 
+
+# define pins
+# initialization is done in MotorController class
 #
-# define pins and initialize low
-#
-GPIO.setmode(GPIO.BOARD)
-GPIO.setwarnings(False)
 XPINS = [13, 15, 16, 18]
 YPINS = [37, 33, 31, 29]
 ZPINS = [32, 36, 38, 40]
-GPIO.setup(XPINS + YPINS + ZPINS,
-           GPIO.OUT,
-           initial=GPIO.LOW)
-
 
 #
 # main line

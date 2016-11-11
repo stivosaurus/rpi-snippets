@@ -46,10 +46,16 @@ class StepperController(object):
         self.pipe = conn
         self.seq = seq
         self.next = 0
+        # setup the pins
         self.pins = pins
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setwarnings(False)
+        GPIO.setup(self.pins, GPIO.OUT, initial=GPIO.LOW)
+        # timing
         self.pulse_time = pulse_time  # time pins are set high
         self.step_time = step_time   # time between steps
         self.odometer = 0
+        # start the subprocess
         self.proc = Process(target=self.run, args=())
         self.proc.start()
 
