@@ -40,18 +40,18 @@ class Hello:
         self.odometery = tk.StringVar()
         self.odometery.set('odometer 0')
         self.Yodometer = tk.Label(self.frame, textvariable = self.odometery)
-        self.logo_image = tk.PhotoImage(file='/home/berg/bin/rpi-snippets/Images/python_logo.png')
+        self.logo_image = tk.PhotoImage(file='/home/pi/rpi-snippets/Images/python_logo.png')
         self.logo = tk.Label(self.frame, image=self.logo_image)
-        self.left_image_up = tk.PhotoImage(file='/home/berg/bin/rpi-snippets/Images/leftup.png')
-        self.left_image_down = tk.PhotoImage(file='/home/berg/bin/rpi-snippets/Images/leftdown.png')
-        self.right_image_up = tk.PhotoImage(file='/home/berg/bin/rpi-snippets/Images/rightup.png')
-        self.right_image_down = tk.PhotoImage(file='/home/berg/bin/rpi-snippets/Images/rightdown.png')
+        self.left_image_up = tk.PhotoImage(file='/home/pi/rpi-snippets/Images/leftup.png')
+        self.left_image_down = tk.PhotoImage(file='/home/pi/rpi-snippets/Images/leftdown.png')
+        self.right_image_up = tk.PhotoImage(file='/home/pi/rpi-snippets/Images/rightup.png')
+        self.right_image_down = tk.PhotoImage(file='/home/pi/rpi-snippets/Images/rightdown.png')
         
         
-        self.up_image_up = tk.PhotoImage(file='/home/berg/bin/rpi-snippets/Images/upup.png')
-        self.up_image_down = tk.PhotoImage(file='/home/berg/bin/rpi-snippets/Images/leftdown.png')
-        self.down_image_up = tk.PhotoImage(file='/home/berg/bin/rpi-snippets/Images/downup.png')
-        self.down_image_down = tk.PhotoImage(file='/home/berg/bin/rpi-snippets/Images/downdown.png')
+        self.up_image_up = tk.PhotoImage(file='/home/pi/rpi-snippets/Images/upup.png')
+        self.up_image_down = tk.PhotoImage(file='/home/pi/rpi-snippets/Images/leftdown.png')
+        self.down_image_up = tk.PhotoImage(file='/home/pi/rpi-snippets/Images/downup.png')
+        self.down_image_down = tk.PhotoImage(file='/home/pi/rpi-snippets/Images/downdown.png')
         
         self.button1 = tk.Button(self.frame, text = 'New Window', width = 10, command = self.new_window)
         
@@ -102,7 +102,7 @@ class Hello:
         
     def Left_Motion_down(self):
         self.LEFT_BUTTON.config(image=self.left_image_down)
-        
+
     def Right_Motion_up(self):
         self.RIGHT_BUTTON.config(image=self.right_image_up)
         
@@ -131,9 +131,6 @@ class Hello:
 
     def close_windows(self):
         self.master.destroy()
-        con0.pipe.send('exit')
-        con1.pipe.send('exit')
-        con2.pipe.send('exit')
         os.system('killall python3')
 
     def leftXController(self):
