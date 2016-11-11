@@ -70,7 +70,11 @@ class Hello:
 
 
     def close_windows(self):
-        master.destroy()
+        self.master.destroy()
+        con0.pipe.send('exit')
+        con1.pipe.send('exit')
+        con2.pipe.send('exit')
+        os.system('killall python3')
 
     def UseXController(self):
         logger.debug("do_stepx() ")
