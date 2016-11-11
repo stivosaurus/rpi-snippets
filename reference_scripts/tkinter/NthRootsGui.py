@@ -2,9 +2,12 @@
 
 ####
 
-import Tkinter as tk
-import math
 
+import math
+try:
+    import Tkinter as tk
+except ImportError:
+    import tkinter as tk # Python 3
 ####
   
 class NthRootsGui(object):
