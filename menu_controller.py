@@ -5,6 +5,9 @@ from datetime import datetime
 import logging
 import sys
 import os
+import RPi.GPIO as GPIO
+
+
 con = None
 # for Berg's particular stepper
 SEQ = [(1, 0, 0, 1),
@@ -16,16 +19,16 @@ SEQ = [(1, 0, 0, 1),
        (0, 0, 1, 1),
        (0, 0, 0, 1)]
 
-#
 # define pins and initialize low
 #
-
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
 XPINS = [13, 15, 16, 18]
 YPINS = [37, 33, 31, 29]
 ZPINS = [32, 36, 38, 40]
-'''GPIO.setup(XPINS + YPINS + ZPINS,
+GPIO.setup(XPINS + YPINS + ZPINS,
            GPIO.OUT,
-           initial=GPIO.LOW)'''
+           initial=GPIO.LOW)
 
 class Hello:
     def __init__(self, master):
