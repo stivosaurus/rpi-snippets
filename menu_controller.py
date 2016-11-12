@@ -131,6 +131,12 @@ class Hello:
 
     def close_windows(self):
         self.master.destroy()
+<<<<<<< HEAD
+=======
+        con0.pipe.send('exit')
+        con1.pipe.send('exit')
+        con2.pipe.send('exit')
+>>>>>>> 4bc04e9d5cbeff41cb935513a1e387c8fd468520
         os.system('killall python3')
 
     def leftXController(self):
