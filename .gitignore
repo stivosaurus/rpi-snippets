@@ -95,6 +95,9 @@ ENV/
 
 # fake RPi module
 RPi
-
+GPIO.py
+this-is-fake-GPIO
+#ignore scrtipts for reference
+reference_scripts
 # generic junk like a.a, a.py
 ?.*
