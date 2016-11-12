@@ -47,6 +47,7 @@ class Hello:
         self.logo_image = tk.PhotoImage(file=self.folderpath + '/Images/python_logo.png')
         self.logo = tk.Label(self.frame, image=self.logo_image)
         #FIXME the path to the images needs to be automatic
+        #Fixed ^^^^^
         self.left_image_up = tk.PhotoImage(file=self.folderpath + '/Images/leftup.png')
         self.left_image_down = tk.PhotoImage(file=self.folderpath + '/Images/leftdown.png')
         self.right_image_up = tk.PhotoImage(file=self.folderpath + '/Images/rightup.png')
@@ -92,6 +93,12 @@ class Hello:
         #------------------------------------------------------------#
         self.New_window_button = tk.Button(self.frame, text = 'New Window', width = 10, command = self.new_window)
         self.quitButton = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
+
+
+        #------------------------------------------------------------#
+        #GRID layout of buttons on screen also do we need to have a 
+        #different display manager pixel positon or pack() place() *grid()
+        #------------------------------------------------------------#
         self.logo.grid(row = 1, column = 1, columnspan = 3)
         self.Xodometer.grid(row = 0, column = 1)
         self.Yodometer.grid(row = 0, column = 2)
