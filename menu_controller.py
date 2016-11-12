@@ -35,6 +35,17 @@ class Hello:
         self.master = master
         self.frame = tk.Frame(self.master)
         self.folderpath = os.getcwd()
+        self.screen = tk.Canvas(self.frame, width = 600, height = 400, bg = 'black', cursor = 'dot', bd = 2)
+        self.screen.create_line(15, 25, 200, 25)
+        self.screen.create_line(300, 35, 300, 200, dash=(4, 2))
+        self.screen.create_line(55, 85, 155, 85, 105, 180, 55, 85)
+        self.screen.create_oval(110, 10, 210, 80, outline="gray", 
+            fill="gray", width=2)
+        self.screen.create_rectangle(230, 10, 290, 60, 
+            outline="gray", fill="gray", width=2)
+        #------------------------------------------------------------#
+        #odometer text
+        #------------------------------------------------------------#
         self.odometerx = tk.StringVar()
         self.odometerx.set('odometer 0')
         self.Xodometer = tk.Label(self.frame, textvariable = self.odometerx)
@@ -114,6 +125,7 @@ class Hello:
         self.quitButton.grid(row=9,column=1)
         self.New_window_button.grid(row=10,column=10)
         self.frame.grid(row=11,column=1)
+        self.screen.grid(rowspan = 10, row=1, column=11)
 #----------------------------------------------------------#
 #left/right up/down button images
 #----------------------------------------------------------#        
