@@ -8,6 +8,9 @@ import os
 import RPi.GPIO as GPIO
 import string
 
+
+b1 = "up"
+xold, yold = None, None
 con = None
 # for Berg's particular stepper
 SEQ = [(1, 0, 0, 1),
@@ -35,7 +38,10 @@ class Hello:
         self.master = master
         self.frame = tk.Frame(self.master)
         self.folderpath = os.getcwd()
-        self.screen = tk.Canvas(self.frame, width = 600, height = 400, bg = 'black', cursor = 'dot', bd = 2)
+#------------------------------------------------------------#
+#screen controlls
+#------------------------------------------------------------#
+        self.screen = tk.Canvas(self.frame, width = 600, height = 400, bg = 'green', cursor = 'dot', bd = 2)
         self.screen.create_line(15, 25, 200, 25)
         self.screen.create_line(300, 35, 300, 200, dash=(4, 2))
         self.screen.create_line(55, 85, 155, 85, 105, 180, 55, 85)
@@ -43,6 +49,9 @@ class Hello:
             fill="gray", width=2)
         self.screen.create_rectangle(230, 10, 290, 60, 
             outline="gray", fill="gray", width=2)
+        self.screen.bind("<Motion>", self.motion)
+        self.screen.bind("<ButtonPress-1>", self.b1down)
+        self.screen.bind("<ButtonRelease-1>", self.b1up)
         #------------------------------------------------------------#
         #odometer text
         #------------------------------------------------------------#
@@ -242,7 +251,31 @@ class Hello:
         logger.debug("do_stepz() ")
         print('i ranz')
         con2.pipe.send('get odometer 2')
-        print(con2.pipe.recv()) 
+        print(con2.pipe.recv())
+
+#-----------------------------------------------------------#
+#we define the mouse movement and the draw method
+#-----------------------------------------------------------#
+
+    def b1down(self, event):
+        global b1
+        b1 = "down"           # you only want to draw when the button is down
+                              # because "Motion" events happen -all the time-
+
+    def b1up(self, event):
+        global b1, xold, yold
+        b1 = "up"
+        xold = None           # reset the line when you let go of the button
+        yold = None
+
+    def motion(self, event):
+        if b1 == "down":
+            global xold, yold
+            if xold is not None and yold is not None:
+                self.screen.create_line(xold,yold,event.x,event.y,smooth=True)
+                              # here's where you draw it. smooth. neat.
+            xold = event.x
+            yold = event.y 
 
 #------------------------------------------------------#
 # Class for file dialog not used yet
