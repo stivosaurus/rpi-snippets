@@ -8,7 +8,8 @@ import os
 import RPi.GPIO as GPIO
 import string
 
-
+x=0
+y=0
 b1 = "up"
 xold, yold = None, None
 con = None
@@ -38,6 +39,8 @@ class Hello:
         self.master = master
         self.frame = tk.Frame(self.master)
         self.folderpath = os.getcwd()
+        self.x =0
+        self.y =0
 #------------------------------------------------------------#
 #screen controlls
 #------------------------------------------------------------#
@@ -61,6 +64,7 @@ class Hello:
         self.odometery = tk.StringVar()
         self.odometery.set('odometer 0')
         self.Yodometer = tk.Label(self.frame, textvariable = self.odometery)
+
         #------------------------------------------------------------#
         #set up The images for buttons and logo
         #------------------------------------------------------------#
@@ -188,6 +192,9 @@ class Hello:
         text = (con0.pipe.recv())
         text = text.strip('odometer: ')
         self.odometerx.set("Odometer: %s"%(text))
+        self.screen.create_line(self.x,self.y,int(text),self.y,smooth=True)
+        self.x = int(text)
+        print (self.x)
 
     def rightXController(self):
         logger.debug("do_stepx() ")
@@ -196,6 +203,9 @@ class Hello:
         text = (con0.pipe.recv())
         text = text.strip('odometer: ')
         self.odometerx.set("Odometerx: %s"%(text))
+        self.screen.create_line(self.x,self.y,int(text),self.y,smooth=True)
+        self.x = int(text)
+        print (self.x)
 
 #------------------------------------------------------#
 # update the Position on the arrow buttons up, down or
@@ -204,20 +214,26 @@ class Hello:
 
     def upYController(self):
         logger.debug("do_stepy() ")
-        con1.pipe.send('step 1')
-        con1.pipe.send('get odometer 1')
-        text = (con1.pipe.recv())
-        text = text.strip('odometer: ')
-        self.odometery.set("Odometery: %s"%(text))  
-
-
-    def downYController(self):
-        logger.debug("do_stepy() ")
         con1.pipe.send('step -1')
         con1.pipe.send('get odometer 1')
         text = (con1.pipe.recv())
         text = text.strip('odometer: ')
-        self.odometery.set("Odometery: %s"%(text))  
+        self.odometery.set("Odometery: %s"%(text))
+        self.screen.create_line(self.x,self.y,self.x,int(text),smooth=True)
+        self.y = int(text)
+        print (self.y)  
+
+
+    def downYController(self):
+        logger.debug("do_stepy() ")
+        con1.pipe.send('step 1')
+        con1.pipe.send('get odometer 1')
+        text = (con1.pipe.recv())
+        text = text.strip('odometer: ')
+        self.odometery.set("Odometery: %s"%(text)) 
+        self.screen.create_line(self.x,self.y,self.x,int(text),smooth=True)
+        self.y = int(text)
+        print (self.y)  
 
 #--------------------------------------------------------#
 # update the Position on the arrow buttons yet to be defined
@@ -277,13 +293,16 @@ class Hello:
         yold = None
 
     def motion(self, event):
+
         if b1 == "down":
+            
             global xold, yold
             if xold is not None and yold is not None:
                 self.screen.create_line(xold,yold,event.x,event.y,smooth=True)
                               # here's where you draw it. smooth. neat.
             xold = event.x
-            yold = event.y 
+            yold = event.y
+            print (yold, xold) 
 
 #------------------------------------------------------#
 # Class for file dialog not used yet
