@@ -34,7 +34,7 @@ class StepperController(object):
                 pins,
                 pulse_time=0.009,
                 step_time=0.0):
-        """Construct a controller and it's pipe"""
+        """Construct a controller and its pipe"""
         parent_end, child_end = Pipe()
         mc = cls(name, child_end, sequence, pins, pulse_time,
                  step_time)
