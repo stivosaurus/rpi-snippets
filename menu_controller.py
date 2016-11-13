@@ -42,6 +42,7 @@ class Hello:
 #screen controlls
 #------------------------------------------------------------#
         self.screen = tk.Canvas(self.frame, width = 600, height = 400, bg = 'green', cursor = 'dot', bd = 2)
+        self.master.rocus_force()
         self.screen.create_line(15, 25, 200, 25)
         self.screen.create_line(300, 35, 300, 200, dash=(4, 2))
         self.screen.create_line(55, 85, 155, 85, 105, 180, 55, 85)
@@ -64,6 +65,7 @@ class Hello:
         #------------------------------------------------------------#
         #set up The images for buttons and logo
         #------------------------------------------------------------#
+        self.clear_screen = tk.PhotoImage(file=self.folderpath + '/Images/aussie.png')
         self.logo_image = tk.PhotoImage(file=self.folderpath + '/Images/python_logo.png')
         self.logo = tk.Label(self.frame, image=self.logo_image)
         #FIXME the path to the images needs to be automatic
@@ -83,7 +85,9 @@ class Hello:
 
         #------------------------------------------------------------#
         #                      set up Buttons
-        #------------------------------------------------------------#        
+        #------------------------------------------------------------# 
+
+        self.CLEARSCREEN = tk.Button(self.frame, image=self.clear_screen, width = 75, command = self.ClearScreen)       
 
         self.LEFT_BUTTON = tk.Button(self.frame, image=self.left_image_up, width = 50, command = self.leftXController, repeatdelay = 500, repeatinterval = 1)
         self.LEFT_BUTTON.bind('<ButtonRelease-1>',self.Left_Motion_up())
@@ -119,6 +123,7 @@ class Hello:
         #GRID layout of buttons on screen also do we need to have a 
         #different display manager pixel positon or pack() place() *grid()
         #------------------------------------------------------------#
+        self.CLEARSCREEN.grid(rowspan = 3, row = 3, column = 2)
         self.logo.grid(row = 1, column = 1, columnspan = 3)
         self.Xodometer.grid(row = 0, column = 1)
         self.Yodometer.grid(row = 0, column = 2)
@@ -231,6 +236,10 @@ class Hello:
         con2.pipe.send('get odometer 2')
         print(con2.pipe.recv())
 
+
+
+    def ClearScreen(self):
+        self.screen.delete('all')
 #------------------------------------------------------#
 #Not Defined yet maybe not used the odometer call
 #------------------------------------------------------#
