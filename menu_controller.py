@@ -42,7 +42,6 @@ class Hello:
 #screen controlls
 #------------------------------------------------------------#
         self.screen = tk.Canvas(self.frame, width = 600, height = 400, bg = 'green', cursor = 'dot', bd = 2)
-        self.master.rocus_force()
         self.screen.create_line(15, 25, 200, 25)
         self.screen.create_line(300, 35, 300, 200, dash=(4, 2))
         self.screen.create_line(55, 85, 155, 85, 105, 180, 55, 85)
