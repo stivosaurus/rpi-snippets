@@ -8,6 +8,10 @@ import os
 import RPi.GPIO as GPIO
 import string
 
+x=0
+y=0
+b1 = "up"
+xold, yold = None, None
 con = None
 # for Berg's particular stepper
 SEQ = [(1, 0, 0, 1),
@@ -35,15 +39,36 @@ class Hello:
         self.master = master
         self.frame = tk.Frame(self.master)
         self.folderpath = os.getcwd()
+        self.x =0
+        self.y =0
+#------------------------------------------------------------#
+#screen controlls
+#------------------------------------------------------------#
+        self.screen = tk.Canvas(self.frame, width = 600, height = 600, bg = 'green', cursor = 'dot', bd = 2)
+        self.screen.create_line(15, 25, 200, 25)
+        self.screen.create_line(300, 35, 300, 200, dash=(4, 2))
+        self.screen.create_line(55, 85, 155, 85, 105, 180, 55, 85)
+        self.screen.create_oval(110, 10, 210, 80, outline="gray", 
+            fill="gray", width=2)
+        self.screen.create_rectangle(230, 10, 290, 60, 
+            outline="gray", fill="gray", width=2)
+        self.screen.bind("<Motion>", self.motion)
+        self.screen.bind("<ButtonPress-1>", self.b1down)
+        self.screen.bind("<ButtonRelease-1>", self.b1up)
+        #------------------------------------------------------------#
+        #odometer text
+        #------------------------------------------------------------#
         self.odometerx = tk.StringVar()
         self.odometerx.set('odometer 0')
         self.Xodometer = tk.Label(self.frame, textvariable = self.odometerx)
         self.odometery = tk.StringVar()
         self.odometery.set('odometer 0')
         self.Yodometer = tk.Label(self.frame, textvariable = self.odometery)
+
         #------------------------------------------------------------#
         #set up The images for buttons and logo
         #------------------------------------------------------------#
+        self.clear_screen = tk.PhotoImage(file=self.folderpath + '/Images/aussie.png')
         self.logo_image = tk.PhotoImage(file=self.folderpath + '/Images/python_logo.png')
         self.logo = tk.Label(self.frame, image=self.logo_image)
         #FIXME the path to the images needs to be automatic
@@ -63,7 +88,9 @@ class Hello:
 
         #------------------------------------------------------------#
         #                      set up Buttons
-        #------------------------------------------------------------#        
+        #------------------------------------------------------------# 
+
+        self.CLEARSCREEN = tk.Button(self.frame, image=self.clear_screen, width = 75, command = self.ClearScreen)       
 
         self.LEFT_BUTTON = tk.Button(self.frame, image=self.left_image_up, width = 50, command = self.leftXController, repeatdelay = 500, repeatinterval = 1)
         self.LEFT_BUTTON.bind('<ButtonRelease-1>',self.Left_Motion_up())
@@ -99,6 +126,7 @@ class Hello:
         #GRID layout of buttons on screen also do we need to have a 
         #different display manager pixel positon or pack() place() *grid()
         #------------------------------------------------------------#
+        self.CLEARSCREEN.grid(rowspan = 3, row = 3, column = 2)
         self.logo.grid(row = 1, column = 1, columnspan = 3)
         self.Xodometer.grid(row = 0, column = 1)
         self.Yodometer.grid(row = 0, column = 2)
@@ -114,6 +142,7 @@ class Hello:
         self.quitButton.grid(row=9,column=1)
         self.New_window_button.grid(row=10,column=10)
         self.frame.grid(row=11,column=1)
+        self.screen.grid(rowspan = 10, row=1, column=11)
 #----------------------------------------------------------#
 #left/right up/down button images
 #----------------------------------------------------------#        
@@ -163,6 +192,9 @@ class Hello:
         text = (con0.pipe.recv())
         text = text.strip('odometer: ')
         self.odometerx.set("Odometer: %s"%(text))
+        self.screen.create_line(self.x,self.y,int(text),self.y,smooth=True)
+        self.x = int(text)
+        print (self.x)
 
     def rightXController(self):
         logger.debug("do_stepx() ")
@@ -171,6 +203,9 @@ class Hello:
         text = (con0.pipe.recv())
         text = text.strip('odometer: ')
         self.odometerx.set("Odometerx: %s"%(text))
+        self.screen.create_line(self.x,self.y,int(text),self.y,smooth=True)
+        self.x = int(text)
+        print (self.x)
 
 #------------------------------------------------------#
 # update the Position on the arrow buttons up, down or
@@ -179,20 +214,26 @@ class Hello:
 
     def upYController(self):
         logger.debug("do_stepy() ")
-        con1.pipe.send('step 1')
-        con1.pipe.send('get odometer 1')
-        text = (con1.pipe.recv())
-        text = text.strip('odometer: ')
-        self.odometery.set("Odometery: %s"%(text))  
-
-
-    def downYController(self):
-        logger.debug("do_stepy() ")
         con1.pipe.send('step -1')
         con1.pipe.send('get odometer 1')
         text = (con1.pipe.recv())
         text = text.strip('odometer: ')
-        self.odometery.set("Odometery: %s"%(text))  
+        self.odometery.set("Odometery: %s"%(text))
+        self.screen.create_line(self.x,self.y,self.x,int(text),smooth=True)
+        self.y = int(text)
+        print (self.y)  
+
+
+    def downYController(self):
+        logger.debug("do_stepy() ")
+        con1.pipe.send('step 1')
+        con1.pipe.send('get odometer 1')
+        text = (con1.pipe.recv())
+        text = text.strip('odometer: ')
+        self.odometery.set("Odometery: %s"%(text)) 
+        self.screen.create_line(self.x,self.y,self.x,int(text),smooth=True)
+        self.y = int(text)
+        print (self.y)  
 
 #--------------------------------------------------------#
 # update the Position on the arrow buttons yet to be defined
@@ -210,6 +251,10 @@ class Hello:
         con2.pipe.send('get odometer 2')
         print(con2.pipe.recv())
 
+
+
+    def ClearScreen(self):
+        self.screen.delete('all')
 #------------------------------------------------------#
 #Not Defined yet maybe not used the odometer call
 #------------------------------------------------------#
@@ -230,7 +275,34 @@ class Hello:
         logger.debug("do_stepz() ")
         print('i ranz')
         con2.pipe.send('get odometer 2')
-        print(con2.pipe.recv()) 
+        print(con2.pipe.recv())
+
+#-----------------------------------------------------------#
+#we define the mouse movement and the draw method
+#-----------------------------------------------------------#
+
+    def b1down(self, event):
+        global b1
+        b1 = "down"           # you only want to draw when the button is down
+                              # because "Motion" events happen -all the time-
+
+    def b1up(self, event):
+        global b1, xold, yold
+        b1 = "up"
+        xold = None           # reset the line when you let go of the button
+        yold = None
+
+    def motion(self, event):
+
+        if b1 == "down":
+            
+            global xold, yold
+            if xold is not None and yold is not None:
+                self.screen.create_line(xold,yold,event.x,event.y,smooth=True)
+                              # here's where you draw it. smooth. neat.
+            xold = event.x
+            yold = event.y
+            print (yold, xold) 
 
 #------------------------------------------------------#
 # Class for file dialog not used yet

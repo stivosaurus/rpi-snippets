@@ -32,7 +32,7 @@ class StepperController(object):
                 name,
                 sequence,
                 pins,
-                pulse_time=0.009,
+                pulse_time=0.002,
                 step_time=0.0):
         """Construct a controller and its pipe"""
         parent_end, child_end = Pipe()
