@@ -185,7 +185,35 @@ class Hello:
 #------------------------------------------------------#
     def leftXController(self):
         logger.debug("do_stepx() ")
-        con0.pipe.send('step -1')
+        self.xController( 'step -1')
+        #
+        # con0.pipe.send('step -1')
+        # con0.pipe.send('get odometer 0')
+        # text = (con0.pipe.recv())
+        # text = text.strip('odometer: ')
+        # self.odometerx.set("Odometer: %s"%(text))
+        # #adding the draw line function to the stepper motors move buttons
+        # self.screen.create_line(self.x, self.y, int(text), self.y, smooth=True, fill = 'red')
+        # self.x = int(text)
+        # print (self.x)
+
+    
+    def rightXController(self):
+        logger.debug("do_stepx() ")
+        self.xController( 'step -1')
+        #
+        # con0.pipe.send('step 1')
+        # con0.pipe.send('get odometer 0')
+        # text = (con0.pipe.recv())
+        # text = text.strip('odometer: ')
+        # self.odometerx.set("Odometerx: %s"%(text))
+        # self.screen.create_line(self.x,self.y,int(text),self.y,smooth=True, fill = 'red')
+        # self.x = int(text)
+        # print (self.x)
+
+    def xController(self, step_cmd ):
+        """ common controller code """
+        con0.pipe.send(step_cmd)
         con0.pipe.send('get odometer 0')
         text = (con0.pipe.recv())
         text = text.strip('odometer: ')
@@ -195,16 +223,6 @@ class Hello:
         self.x = int(text)
         print (self.x)
 
-    def rightXController(self):
-        logger.debug("do_stepx() ")
-        con0.pipe.send('step 1')
-        con0.pipe.send('get odometer 0')
-        text = (con0.pipe.recv())
-        text = text.strip('odometer: ')
-        self.odometerx.set("Odometerx: %s"%(text))
-        self.screen.create_line(self.x,self.y,int(text),self.y,smooth=True, fill = 'red')
-        self.x = int(text)
-        print (self.x)
 
 #------------------------------------------------------#
 # update the Position on the arrow buttons up, down or
