@@ -44,14 +44,12 @@ class Hello:
 #------------------------------------------------------------#
 #screen controlls
 #------------------------------------------------------------#
-        self.screen = tk.Canvas(self.frame, width = 600, height = 600, bg = 'green', cursor = 'dot', bd = 2)
-        self.screen.create_line(15, 25, 200, 25)
-        self.screen.create_line(300, 35, 300, 200, dash=(4, 2))
-        self.screen.create_line(55, 85, 155, 85, 105, 180, 55, 85)
-        self.screen.create_oval(110, 10, 210, 80, outline="gray", 
-            fill="gray", width=2)
-        self.screen.create_rectangle(230, 10, 290, 60, 
-            outline="gray", fill="gray", width=2)
+        self.screen = tk.Canvas(self.frame, width = 600, height = 600, bg = 'black', cursor = 'dot', bd = 2)
+        self.screen.create_line(15, 25, 200, 25, fill = 'red')
+        self.screen.create_line(300, 35, 300, 200, dash=(4, 2), fill = 'red')
+        self.screen.create_line(55, 85, 155, 85, 105, 180, 55, 85, fill = 'red')
+        self.screen.create_oval(110, 10, 210, 80, outline="gray", fill = 'red', width=2)
+        self.screen.create_rectangle(230, 10, 290, 60, outline="gray", fill = 'red', width=2)
         self.screen.bind("<Motion>", self.motion)
         self.screen.bind("<ButtonPress-1>", self.b1down)
         self.screen.bind("<ButtonRelease-1>", self.b1up)
@@ -192,7 +190,8 @@ class Hello:
         text = (con0.pipe.recv())
         text = text.strip('odometer: ')
         self.odometerx.set("Odometer: %s"%(text))
-        self.screen.create_line(self.x,self.y,int(text),self.y,smooth=True)
+        #adding the draw line function to the stepper motors move buttons
+        self.screen.create_line(self.x, self.y, int(text), self.y, smooth=True, fill = 'red')
         self.x = int(text)
         print (self.x)
 
@@ -203,7 +202,7 @@ class Hello:
         text = (con0.pipe.recv())
         text = text.strip('odometer: ')
         self.odometerx.set("Odometerx: %s"%(text))
-        self.screen.create_line(self.x,self.y,int(text),self.y,smooth=True)
+        self.screen.create_line(self.x,self.y,int(text),self.y,smooth=True, fill = 'red')
         self.x = int(text)
         print (self.x)
 
@@ -219,7 +218,7 @@ class Hello:
         text = (con1.pipe.recv())
         text = text.strip('odometer: ')
         self.odometery.set("Odometery: %s"%(text))
-        self.screen.create_line(self.x,self.y,self.x,int(text),smooth=True)
+        self.screen.create_line(self.x,self.y,self.x,int(text),smooth=True, fill = 'red')
         self.y = int(text)
         print (self.y)  
 
@@ -231,7 +230,7 @@ class Hello:
         text = (con1.pipe.recv())
         text = text.strip('odometer: ')
         self.odometery.set("Odometery: %s"%(text)) 
-        self.screen.create_line(self.x,self.y,self.x,int(text),smooth=True)
+        self.screen.create_line(self.x,self.y,self.x,int(text),smooth=True, fill = 'red')
         self.y = int(text)
         print (self.y)  
 
