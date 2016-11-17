@@ -33,14 +33,17 @@ ZPINS = [32, 36, 38, 40]
 GPIO.setup(XPINS + YPINS + ZPINS,
            GPIO.OUT,
            initial=GPIO.LOW)
-
+COUNT = 0
 class Hello:
     def __init__(self, master):
         self.master = master
         self.frame = tk.Frame(self.master)
         self.folderpath = os.getcwd()
+        self.Points = []
+        self.Made = {}
         self.x =0
         self.y =0
+
 #------------------------------------------------------------#
 #screen controlls
 #------------------------------------------------------------#
@@ -50,9 +53,14 @@ class Hello:
         self.screen.create_line(55, 85, 155, 85, 105, 180, 55, 85, fill = 'red')
         self.screen.create_oval(110, 10, 210, 80, outline="gray", fill = 'red', width=2)
         self.screen.create_rectangle(230, 10, 290, 60, outline="gray", fill = 'red', width=2)
+        self.screen.bind('<ButtonPress-1>', self.onStart)
         self.screen.bind("<Motion>", self.motion)
         self.screen.bind("<ButtonPress-1>", self.b1down)
         self.screen.bind("<ButtonRelease-1>", self.b1up)
+        #------------------------------------------------------------#
+        #adding a right mouse action to total canvas
+        #------------------------------------------------------------#
+        self.screen.bind('<ButtonPress-3>', self.MovItem)
         #------------------------------------------------------------#
         #odometer text
         #------------------------------------------------------------#
@@ -120,7 +128,7 @@ class Hello:
         self.quitButton = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
 
 
-        #------------------------------------------------------------#
+        #------------------------------------------------self.count------------#
         #GRID layout of buttons on screen also do we need to have a 
         #different display manager pixel positon or pack() place() *grid()
         #------------------------------------------------------------#
@@ -200,7 +208,7 @@ class Hello:
     
     def rightXController(self):
         logger.debug("do_stepx() ")
-        self.xController( 'step -1')
+        self.xController( 'step 1')
         #
         # con0.pipe.send('step 1')
         # con0.pipe.send('get odometer 0')
@@ -250,7 +258,7 @@ class Hello:
         self.odometery.set("Odometery: %s"%(text)) 
         self.screen.create_line(self.x,self.y,self.x,int(text),smooth=True, fill = 'red')
         self.y = int(text)
-        print (self.y)  
+        print (self.y) 
 
 #--------------------------------------------------------#
 # update the Position on the arrow buttons yet to be defined
@@ -296,7 +304,10 @@ class Hello:
 
 #-----------------------------------------------------------#
 #we define the mouse movement and the draw method
+#	circle  centerx, centery,  radius
 #-----------------------------------------------------------#
+    def onStart(self, event):
+        self.start = event
 
     def b1down(self, event):
         global b1
@@ -310,17 +321,27 @@ class Hello:
         yold = None
 
     def motion(self, event):
-
         if b1 == "down":
             
             global xold, yold
+            
             if xold is not None and yold is not None:
-                self.screen.create_line(xold,yold,event.x,event.y,smooth=True)
+                itemMade = self.screen.create_line(xold,yold,event.x,event.y,smooth=True, fill = 'red')
+                self.Points.append([itemMade, xold, yold, event.x, event.y])
+                
                               # here's where you draw it. smooth. neat.
             xold = event.x
-            yold = event.y
-            print (yold, xold) 
-
+            yold = event.y 
+            
+    def MovItem(self,event):
+        for p, xold, yold, x , y in self.Points:
+            diffX, diffY = (event.x - x), (event.y - y)
+            self.screen.move(p, diffX, diffY)
+        
+       
+        
+        
+        
 #------------------------------------------------------#
 # Class for file dialog not used yet
 #------------------------------------------------------#  
