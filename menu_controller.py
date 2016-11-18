@@ -7,7 +7,7 @@ import sys
 import os
 import RPi.GPIO as GPIO
 import string
-
+shape = ''
 x=0
 y=0
 b1 = "up"
@@ -141,15 +141,15 @@ class Hello:
         #Object Buttons
         #------------------------------------------------------------#
 
-        self.CircleButton = tk.Button(self.frame, text = 'Oval', width = 10)
-        self.CircleButton.bind('ButtonPress-1',self.MyFunction('oval'))
-        self.RectButton = tk.Button(self.frame, text = 'Rectangle', width = 10)        
-        self.RectButton.bind('<ButtonPress-1>',self.MyFunction('rect'))
-        self.LineButton = tk.Button(self.frame, text = 'Lines', width = 10, command = self.close_windows)
-        self.PolygonButton = tk.Button(self.frame, text = 'Bumpy Circles', width = 10, command = self.close_windows)
-        self.PolygonButton1 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
-        self.PolygonButton2 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
-        self.PolygonButton3 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)        
+        self.CircleButton = tk.Button(self.frame, text = 'Oval', width = 10, command = self.MyFunctionOval)
+        #self.CircleButton.bind('ButtonPress-1',self.MyFunction('oval'))
+        self.RectButton = tk.Button(self.frame, text = 'Rectangle', width = 10, command = self.MyFunctionRectangle)        
+        #self.RectButton.bind('<ButtonPress-1>',self.MyFunction('rect'))
+        #self.LineButton = tk.Button(self.frame, text = 'Lines', width = 10, command = self.MyFunction('oval'))
+        #self.PolygonButton = tk.Button(self.frame, text = 'Bumpy Circles', width = 10, command =self.MyFunction('oval'))
+        #self.PolygonButton1 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
+        #self.PolygonButton2 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
+        #self.PolygonButton3 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)        
 
         #------------------------------------------------self.count------------#
         #GRID layout of buttons on screen also do we need to have a 
@@ -187,8 +187,8 @@ class Hello:
         #object buttons
         self.CircleButton.grid(row=6,column=1)
         self.RectButton.grid(row=6,column=2) 
-        self.LineButton.grid(row=7,column=1) 
-        self.PolygonButton.grid(row=7,column=2)
+        #self.LineButton.grid(row=7,column=1) 
+        #self.PolygonButton.grid(row=7,column=2)
         
 #----------------------------------------------------------#
 #left/right up/down button images
@@ -377,13 +377,10 @@ class Hello:
             self.start = event
         
 #flipping functions to suit desired object shape rect and oval
-    def MyFunction(self, shape):
-        if shape == 'oval':
-            self.myfunc = self.screen.create_oval
-            print(shape)  
-        elif shape == 'rect':
-            self.myfunc = self.screen.create_oval 
-            print(shape)     
+    def MyFunctionOval(self):
+        self.myfunc = self.screen.create_oval 
+    def MyFunctionRectangle(self):
+        self.myfunc = self.screen.create_rectangle      
         
         
         
