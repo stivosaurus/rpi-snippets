@@ -49,6 +49,9 @@ class Hello:
 #screen controlls
 #------------------------------------------------------------#
         self.screen = tk.Canvas(self.frame, width = 600, height = 600, bg = 'black', cursor = 'dot', bd = 2)
+        #default value for shape change so it dont get an error
+        self.myfunc = self.screen.create_oval
+        self.object = "Oval"
         #removed test objects
         '''
         self.screen.create_line(15, 25, 200, 25, fill = 'red')
@@ -66,7 +69,6 @@ class Hello:
         #------------------------------------------------------------#
         #adding a right mouse action to total canvas/screen
         #------------------------------------------------------------#
-        self.screen.bind('<ButtonPress-3>', self.onMove)
         #------------------------------------------------------------#
         #odometer text
         #------------------------------------------------------------#
@@ -144,8 +146,8 @@ class Hello:
         self.CircleButton = tk.Button(self.frame, text = 'Oval', width = 10, command = self.MyFunctionOval)
         #self.CircleButton.bind('ButtonPress-1',self.MyFunction('oval'))
         self.RectButton = tk.Button(self.frame, text = 'Rectangle', width = 10, command = self.MyFunctionRectangle)        
-        #self.RectButton.bind('<ButtonPress-1>',self.MyFunction('rect'))
-        #self.LineButton = tk.Button(self.frame, text = 'Lines', width = 10, command = self.MyFunction('oval'))
+        #self.LineButton.bind('<ButtonPress-1>',self.MyFunctionLine)
+        self.LineButton = tk.Button(self.frame, text = 'Lines', width = 10, command = self.MyFunctionLine)
         #self.PolygonButton = tk.Button(self.frame, text = 'Bumpy Circles', width = 10, command =self.MyFunction('oval'))
         #self.PolygonButton1 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
         #self.PolygonButton2 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
@@ -187,7 +189,7 @@ class Hello:
         #object buttons
         self.CircleButton.grid(row=6,column=1)
         self.RectButton.grid(row=6,column=2) 
-        #self.LineButton.grid(row=7,column=1) 
+        self.LineButton.grid(row=7,column=1) 
         #self.PolygonButton.grid(row=7,column=2)
         
 #----------------------------------------------------------#
@@ -361,9 +363,11 @@ class Hello:
 
     def onGrow(self, event):    
         if self.drawn: self.screen.delete(self.drawn)
-        objectId = self.myfunc(self.start.x, self.start.y, event.x, event.y, outline = 'green')
+        objectId = self.myfunc(self.start.x, self.start.y, event.x, event.y, fill = 'green', width = 2)
+        
         if trace: print (objectId)
         self.drawn = objectId
+        print(objectId , self.object ,self.start.x, self.start.y, event.x, event.y)
 
     def onClear(self, event):
         event.widget.delete('all')
@@ -378,10 +382,14 @@ class Hello:
         
 #flipping functions to suit desired object shape rect and oval
     def MyFunctionOval(self):
-        self.myfunc = self.screen.create_oval 
+        self.myfunc = self.screen.create_oval
+        self.object = "Oval" 
     def MyFunctionRectangle(self):
-        self.myfunc = self.screen.create_rectangle      
-        
+        self.myfunc = self.screen.create_rectangle 
+        self.object = "Rectangle"      
+    def MyFunctionLine(self):
+        self.myfunc = self.screen.create_line 
+        self.object = "Line"       
         
         
 #------------------------------------------------------#
