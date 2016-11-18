@@ -141,8 +141,10 @@ class Hello:
         #Object Buttons
         #------------------------------------------------------------#
 
-        self.CircleButton = tk.Button(self.frame, text = 'Circles', width = 10, command = self.close_windows)
-        self.RectButton = tk.Button(self.frame, text = 'Squares', width = 10, command = self.close_windows)
+        self.CircleButton = tk.Button(self.frame, text = 'Oval', width = 10)
+        self.CircleButton.bind('ButtonPress-1',self.MyFunction('oval'))
+        self.RectButton = tk.Button(self.frame, text = 'Rectangle', width = 10)        
+        self.RectButton.bind('<ButtonPress-1>',self.MyFunction('rect'))
         self.LineButton = tk.Button(self.frame, text = 'Lines', width = 10, command = self.close_windows)
         self.PolygonButton = tk.Button(self.frame, text = 'Bumpy Circles', width = 10, command = self.close_windows)
         self.PolygonButton1 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
@@ -328,7 +330,7 @@ class Hello:
         self.screen.delete('all')
 #------------------------------------------------------#
 #Not Defined yet maybe not used the odometer call
-#------------------------------------------------------#
+#--------------------------------------
 
     def OdomXController(self):
         logger.debug("do_stepz() ")
@@ -348,6 +350,7 @@ class Hello:
         con2.pipe.send('get odometer 2')
         print(con2.pipe.recv())
 
+
 #-----------------------------------------------------------#
 #we define the mouse movement and the draw method
 #	circle  centerx, centery,  radius
@@ -358,7 +361,7 @@ class Hello:
 
     def onGrow(self, event):    
         if self.drawn: self.screen.delete(self.drawn)
-        objectId = self.screen.create_oval(self.start.x, self.start.y, event.x, event.y, outline = 'green')
+        objectId = self.myfunc(self.start.x, self.start.y, event.x, event.y, outline = 'green')
         if trace: print (objectId)
         self.drawn = objectId
 
@@ -373,7 +376,14 @@ class Hello:
             canvas.move(self.drawn, diffX, diffY)
             self.start = event
         
-       
+#flipping functions to suit desired object shape rect and oval
+    def MyFunction(self, shape):
+        if shape == 'oval':
+            self.myfunc = self.screen.create_oval
+            print(shape)  
+        elif shape == 'rect':
+            self.myfunc = self.screen.create_oval 
+            print(shape)     
         
         
         
