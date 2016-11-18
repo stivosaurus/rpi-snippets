@@ -50,6 +50,8 @@ class Hello:
 #------------------------------------------------------------#
         self.screen = tk.Canvas(self.frame, width = 600, height = 600, bg = 'black', cursor = 'dot', bd = 2)
         #default value for shape change so it dont get an error
+        self.optionvar = tk.StringVar()
+        self.optionvar = 'red'
         self.myfunc = self.screen.create_oval
         self.object = "Oval"
         #removed test objects
@@ -81,7 +83,8 @@ class Hello:
         self.odometerz = tk.StringVar()
         self.odometerz.set('odometer 0')
         self.Zodometer = tk.Label(self.frame, textvariable = self.odometerz)
-
+        choices = ['red', 'green', 'blue', 'yellow','white', 'magenta']
+        self.options = tk.OptionMenu(self.frame, self.optionvar[0], *choices)
         #------------------------------------------------------------#
         #set up The images for buttons and logo
         #------------------------------------------------------------#
@@ -191,6 +194,7 @@ class Hello:
         self.RectButton.grid(row=6,column=2) 
         self.LineButton.grid(row=7,column=1) 
         #self.PolygonButton.grid(row=7,column=2)
+        self.options.grid(row = 10, column = 1)
         
 #----------------------------------------------------------#
 #left/right up/down button images
@@ -367,6 +371,7 @@ class Hello:
         
         if trace: print (objectId)
         self.drawn = objectId
+        print(self.drawn)
         print(objectId , self.object ,self.start.x, self.start.y, event.x, event.y)
 
     def onClear(self, event):
@@ -378,6 +383,7 @@ class Hello:
             canvas = event.widget
             diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
             canvas.move(self.drawn, diffX, diffY)
+            
             self.start = event
         
 #flipping functions to suit desired object shape rect and oval
@@ -389,7 +395,13 @@ class Hello:
         self.object = "Rectangle"      
     def MyFunctionLine(self):
         self.myfunc = self.screen.create_line 
-        self.object = "Line"       
+        self.object = "Line"
+
+
+#to edit a object .itemconfig(<object id>, fill="blue") 
+# change color 
+#,.coords(i, new_xy) 
+# change coordinates      
         
         
 #------------------------------------------------------#
