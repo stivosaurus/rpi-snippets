@@ -13,6 +13,7 @@ y=0
 b1 = "up"
 xold, yold = None, None
 con = None
+trace = 0 
 # for Berg's particular stepper
 SEQ = [(1, 0, 0, 1),
        (1, 0, 0, 0),
@@ -48,19 +49,24 @@ class Hello:
 #screen controlls
 #------------------------------------------------------------#
         self.screen = tk.Canvas(self.frame, width = 600, height = 600, bg = 'black', cursor = 'dot', bd = 2)
+        #removed test objects
+        '''
         self.screen.create_line(15, 25, 200, 25, fill = 'red')
         self.screen.create_line(300, 35, 300, 200, dash=(4, 2), fill = 'red')
         self.screen.create_line(55, 85, 155, 85, 105, 180, 55, 85, fill = 'red')
         self.screen.create_oval(110, 10, 210, 80, outline="gray", fill = 'red', width=2)
         self.screen.create_rectangle(230, 10, 290, 60, outline="gray", fill = 'red', width=2)
-        self.screen.bind('<ButtonPress-1>', self.onStart)
-        self.screen.bind("<Motion>", self.motion)
-        self.screen.bind("<ButtonPress-1>", self.b1down)
-        self.screen.bind("<ButtonRelease-1>", self.b1up)
+        '''
+        
+        #mouse events caught on screen
+        self.screen.bind('<ButtonPress-1>', self.onStart)  
+        self.screen.bind('<B1-Motion>',     self.onGrow)   
+        self.screen.bind('<Double-1>',      self.onClear)  
+        self.screen.bind('<ButtonPress-3>', self.onMove)
         #------------------------------------------------------------#
-        #adding a right mouse action to total canvas
+        #adding a right mouse action to total canvas/screen
         #------------------------------------------------------------#
-        self.screen.bind('<ButtonPress-3>', self.MovItem)
+        self.screen.bind('<ButtonPress-3>', self.onMove)
         #------------------------------------------------------------#
         #odometer text
         #------------------------------------------------------------#
@@ -70,6 +76,9 @@ class Hello:
         self.odometery = tk.StringVar()
         self.odometery.set('odometer 0')
         self.Yodometer = tk.Label(self.frame, textvariable = self.odometery)
+        self.odometerz = tk.StringVar()
+        self.odometerz.set('odometer 0')
+        self.Zodometer = tk.Label(self.frame, textvariable = self.odometerz)
 
         #------------------------------------------------------------#
         #set up The images for buttons and logo
@@ -114,11 +123,11 @@ class Hello:
         self.DOWN_BUTTON.bind('<ButtonRelease-1>',self.Right_Motion_up())
         self.DOWN_BUTTON.bind('<Button-1>',self.Right_Motion_down())
         
-        self.use2 = tk.Button(self.frame, text = 'usez', width = 10, command = self.ForwardZController, repeatdelay = 500, repeatinterval = 1)
+        self.spindleup = tk.Button(self.frame, text = 'Spindle UP', width = 10, command = self.ForwardZController, repeatdelay = 500, repeatinterval = 1)
 
 
         
-        self.stepRev2 = tk.Button(self.frame, text = 'stepRevz', width = 10, command = self.ReverseZController, repeatdelay = 500, repeatinterval = 1)
+        self.spindledown = tk.Button(self.frame, text = 'Spindle DOWN', width = 10, command = self.ReverseZController, repeatdelay = 500, repeatinterval = 1)
 
 
         #------------------------------------------------------------#
@@ -128,35 +137,67 @@ class Hello:
         self.quitButton = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
 
 
+        #------------------------------------------------------------#
+        #Object Buttons
+        #------------------------------------------------------------#
+
+        self.CircleButton = tk.Button(self.frame, text = 'Circles', width = 10, command = self.close_windows)
+        self.RectButton = tk.Button(self.frame, text = 'Squares', width = 10, command = self.close_windows)
+        self.LineButton = tk.Button(self.frame, text = 'Lines', width = 10, command = self.close_windows)
+        self.PolygonButton = tk.Button(self.frame, text = 'Bumpy Circles', width = 10, command = self.close_windows)
+        self.PolygonButton1 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
+        self.PolygonButton2 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
+        self.PolygonButton3 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)        
+
         #------------------------------------------------self.count------------#
         #GRID layout of buttons on screen also do we need to have a 
         #different display manager pixel positon or pack() place() *grid()
         #------------------------------------------------------------#
         self.CLEARSCREEN.grid(rowspan = 3, row = 3, column = 2)
+        
         self.logo.grid(row = 1, column = 1, columnspan = 3)
+        
         self.Xodometer.grid(row = 0, column = 1)
+        
         self.Yodometer.grid(row = 0, column = 2)
         
+        self.Zodometer.grid(row = 0, column = 3)
+        
         self.RIGHT_BUTTON.grid(row=3,column=6)
+        
         self.LEFT_BUTTON.grid(row=3,column=4)
         
         self.DOWN_BUTTON.grid(row=4,column=5)
+        
         self.UP_BUTTON.grid(row=2,column=5)
         
-        self.use2.grid(row=5,column=1)
-        self.stepRev2.grid(row=5,column=2)
+        self.spindleup.grid(row=5,column=1)
+        
+        self.spindledown.grid(row=5,column=2)
+        
         self.quitButton.grid(row=9,column=1)
+        
         self.New_window_button.grid(row=10,column=10)
-        self.frame.grid(row=11,column=1)
+        
+        self.frame.grid(row=50,column=50)
+        #put the screen on the master window
         self.screen.grid(rowspan = 10, row=1, column=11)
+        #object buttons
+        self.CircleButton.grid(row=6,column=1)
+        self.RectButton.grid(row=6,column=2) 
+        self.LineButton.grid(row=7,column=1) 
+        self.PolygonButton.grid(row=7,column=2)
+        
 #----------------------------------------------------------#
 #left/right up/down button images
 #----------------------------------------------------------#        
     def Left_Motion_up(self):
         self.LEFT_BUTTON.config(image=self.left_image_up)
+        self.LEFT_BUTTON.update()
         
     def Left_Motion_down(self):
         self.LEFT_BUTTON.config(image=self.left_image_down)
+        self.LEFT_BUTTON.update()
 
     def Right_Motion_up(self):
         self.RIGHT_BUTTON.config(image=self.right_image_up)
@@ -244,7 +285,7 @@ class Hello:
         text = (con1.pipe.recv())
         text = text.strip('odometer: ')
         self.odometery.set("Odometery: %s"%(text))
-        self.screen.create_line(self.x,self.y,self.x,int(text),smooth=True, fill = 'red')
+        self.screen.create_oval(self.x,self.y,self.x,int(text),smooth=True, fill = 'red')
         self.y = int(text)
         print (self.y)  
 
@@ -268,13 +309,18 @@ class Hello:
         logger.debug("do_stepz() ")
         con2.pipe.send('step 1')
         con2.pipe.send('get odometer 2')
-        print(con2.pipe.recv())
-
+        text = (con2.pipe.recv())        
+        text = text.strip('odometer: ')
+        self.odometerz.set("Odometery: %s"%(text))
+        
+        
     def ReverseZController(self):
         logger.debug("do_stepz() ")
         con2.pipe.send('step -1')
         con2.pipe.send('get odometer 2')
-        print(con2.pipe.recv())
+        text = (con2.pipe.recv())
+        text = text.strip('odometer: ')
+        self.odometerz.set("Odometery: %s"%(text))
 
 
 
@@ -308,35 +354,24 @@ class Hello:
 #-----------------------------------------------------------#
     def onStart(self, event):
         self.start = event
+        self.drawn = None
 
-    def b1down(self, event):
-        global b1
-        b1 = "down"           # you only want to draw when the button is down
-                              # because "Motion" events happen -all the time-
+    def onGrow(self, event):    
+        if self.drawn: self.screen.delete(self.drawn)
+        objectId = self.screen.create_oval(self.start.x, self.start.y, event.x, event.y, outline = 'green')
+        if trace: print (objectId)
+        self.drawn = objectId
 
-    def b1up(self, event):
-        global b1, xold, yold
-        b1 = "up"
-        xold = None           # reset the line when you let go of the button
-        yold = None
+    def onClear(self, event):
+        event.widget.delete('all')
 
-    def motion(self, event):
-        if b1 == "down":
-            
-            global xold, yold
-            
-            if xold is not None and yold is not None:
-                itemMade = self.screen.create_line(xold,yold,event.x,event.y,smooth=True, fill = 'red')
-                self.Points.append([itemMade, xold, yold, event.x, event.y])
-                
-                              # here's where you draw it. smooth. neat.
-            xold = event.x
-            yold = event.y 
-            
-    def MovItem(self,event):
-        for p, xold, yold, x , y in self.Points:
-            diffX, diffY = (event.x - x), (event.y - y)
-            self.screen.move(p, diffX, diffY)
+    def onMove(self, event):
+        if self.drawn:            
+            if trace: print (self.drawn)
+            canvas = event.widget
+            diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
+            canvas.move(self.drawn, diffX, diffY)
+            self.start = event
         
        
         
