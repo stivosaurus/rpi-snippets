@@ -10,10 +10,12 @@ import string
 shape = ''
 x=0
 y=0
+ID = 1
 b1 = "up"
 xold, yold = None, None
 con = None
 trace = 0 
+Colour = None
 # for Berg's particular stepper
 SEQ = [(1, 0, 0, 1),
        (1, 0, 0, 0),
@@ -151,7 +153,7 @@ class Hello:
         self.RectButton = tk.Button(self.frame, text = 'Rectangle', width = 10, command = self.MyFunctionRectangle)        
         #self.LineButton.bind('<ButtonPress-1>',self.MyFunctionLine)
         self.LineButton = tk.Button(self.frame, text = 'Lines', width = 10, command = self.MyFunctionLine)
-        #self.PolygonButton = tk.Button(self.frame, text = 'Bumpy Circles', width = 10, command =self.MyFunction('oval'))
+        self.EditButton = tk.Button(self.frame, text = 'Edit', width = 10, command =self.MyFunctionEdit)
         #self.PolygonButton1 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
         #self.PolygonButton2 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
         #self.PolygonButton3 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)        
@@ -193,7 +195,7 @@ class Hello:
         self.CircleButton.grid(row=6,column=1)
         self.RectButton.grid(row=6,column=2) 
         self.LineButton.grid(row=7,column=1) 
-        #self.PolygonButton.grid(row=7,column=2)
+        self.EditButton.grid(row=7,column=2)
         self.options.grid(row = 10, column = 1)
         
 #----------------------------------------------------------#
@@ -367,16 +369,35 @@ class Hello:
 
     def onGrow(self, event):    
         if self.drawn: self.screen.delete(self.drawn)
-        objectId = self.myfunc(self.start.x, self.start.y, event.x, event.y, fill = 'green', width = 2)
-        
-        if trace: print (objectId)
-        self.drawn = objectId
-        print(repr(self.screen['bg']))
-        help(self.screen)
+        #this is the line that makes the object I need to have it in 
+        #an if statement to deside wether to create of edit an object
+        if self.edit_type == 0:
+            objectId = self.myfunc(self.start.x, self.start.y, event.x, event.y, width = 2)
+            self.drawn = objectId
+        else:
+            #if self.object: self.screen.delete(self.object)
+            diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
+            print(self.object, int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]), int(self.co_ords[3]))
+            self.screen.coords(self.object, int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]), int(self.co_ords[3]))
+            #x1, y1, x2, y2 = self.screen.coords(self.drawn)
+            #print(diffX, diffY, x2, y2)
+            #print(canvas.move(self.drawn, (self.co_ords[0]+diffX), (self.co_ords[1]+diffY)))
+            
+        print (self.Colour)
+        if self.Colour == 0:
+            self.screen.itemconfig(self.drawn, fill = 'red', tags=("one", "two"))
+        else:
+            self.screen.itemconfig(self.drawn, outline = 'green')
+        if trace: print (self.drawn)
+        #lines bellow show keywords and methods for config 
+        #commented out to see options from one object scroll
+        #to botom of this file
+        #help(self.screen)#this option returns the size x y and position x y
+        #print(self.screen.itemconfig(ID))
         #print(objectId , self.object ,self.start.x, self.start.y, event.x, event.y)
 
     def onClear(self, event):
-        event.widget.delete('all')
+        event.widget.delete(self.drawn)
 
     def onMove(self, event):
         if self.drawn:            
@@ -387,16 +408,27 @@ class Hello:
             
             self.start = event
         
-#flipping functions to suit desired object shape rect and oval
+#flipping functions to suit desired object shape rect and oval or edit
     def MyFunctionOval(self):
         self.myfunc = self.screen.create_oval
-        self.object = "Oval" 
+        self.object = "Oval"
+        self.Colour = 1
+        self.edit_type = 0 
     def MyFunctionRectangle(self):
         self.myfunc = self.screen.create_rectangle 
-        self.object = "Rectangle"      
+        self.object = "Rectangle"
+        self.Colour = 1
+        self.edit_type = 0      
     def MyFunctionLine(self):
         self.myfunc = self.screen.create_line 
         self.object = "Line"
+        self.Colour = 0
+        self.edit_type = 0
+    def MyFunctionEdit(self):
+        self.myfunc = self.screen.itemconfig 
+        self.edit_type = 1
+        self.co_ords= self.screen.coords(self.drawn)
+        self.object = self.drawn
 
 
 #to edit a object .itemconfig(<object id>, fill="blue") 
@@ -446,3 +478,11 @@ if __name__ == '__main__':
     logger.info("Start: %s", datetime.now())
     logger.info(os.getcwd())
     main()
+    
+    
+    
+    
+    
+    '''keyword for objects 
+    {'width': ('width', '', '', '1.0', '2.0'), 'activeoutline': ('activeoutline', '', '', '', ''), 'activestipple': ('activestipple', '', '', '', ''), 'outline': ('outline', '', '', 'black', 'black'), 'activedash': ('activedash', '', '', '', ''), 'fill': ('fill', '', '', '', 'green'), 'offset': ('offset', '', '', '0,0', '0,0'), 'activefill': ('activefill', '', '', '', ''), 'activewidth': ('activewidth', '', '', '0.0', '0.0'), 'dashoffset': ('dashoffset', '', '', '0', '0'), 'disableddash': ('disableddash', '', '', '', ''), 'disabledwidth': ('disabledwidth', '', '', '0.0', '0'), 'disabledoutline': ('disabledoutline', '', '', '', ''), 'outlinestipple': ('outlinestipple', '', '', '', ''), 'disabledfill': ('disabledfill', '', '', '', ''), 'disabledstipple': ('disabledstipple', '', '', '', ''), 'disabledoutlinestipple': ('disabledoutlinestipple', '', '', '', ''), 'tags': ('tags', '', '', '', 'Oval'), 'activeoutlinestipple': ('activeoutlinestipple', '', '', '', ''), 'stipple': ('stipple', '', '', '', ''), 'outlineoffset': ('outlineoffset', '', '', '0,0', '0,0'), 'state': ('state', '', '', '', ''), 'dash': ('dash', '', '', '', '')}
+    '''
