@@ -371,8 +371,9 @@ class Hello:
         
         if trace: print (objectId)
         self.drawn = objectId
-        print(self.drawn)
-        print(objectId , self.object ,self.start.x, self.start.y, event.x, event.y)
+        print(repr(self.screen['bg']))
+        help(self.screen)
+        #print(objectId , self.object ,self.start.x, self.start.y, event.x, event.y)
 
     def onClear(self, event):
         event.widget.delete('all')
