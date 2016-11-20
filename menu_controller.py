@@ -76,8 +76,8 @@ class Hello:
         #mouse events caught on screen
         self.screen.bind('<ButtonPress-1>', self.onStart)  
         self.screen.bind('<B1-Motion>',     self.onGrow)   
-        self.screen.bind('<Double-1>',      self.onClear)  
-        self.screen.bind('<ButtonPress-3>', self.onMove)
+        self.screen.bind('<Double-1>',      self.onClear)
+        self.screen.bind('<B3-Motion>', self.MyFunctionMove)
         #------------------------------------------------------------#
         #adding a right mouse action to total canvas/screen
         #------------------------------------------------------------#
@@ -173,7 +173,8 @@ class Hello:
         #self.LineButton.bind('<ButtonPress-1>',self.MyFunctionLine)
         self.LineButton = tk.Button(self.frame, text = 'Lines', width = 10, command = self.MyFunctionLine)
         self.EditButton = tk.Button(self.frame, text = 'Edit', width = 10, command =self.MyFunctionEdit)
-        #self.PolygonButton1 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
+
+        self.MoveButton = tk.Button(self.frame, text = 'Move', width = 10)
         #self.PolygonButton2 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
         #self.PolygonButton3 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)        
 
@@ -215,6 +216,7 @@ class Hello:
         self.RectButton.grid(row=6,column=2) 
         self.LineButton.grid(row=7,column=1) 
         self.EditButton.grid(row=7,column=2)
+        #self.MoveButton.grid(row=8, column=1)
         
 #----------------------------------------------------------#
 #left/right up/down button images
@@ -398,11 +400,11 @@ class Hello:
             global choices
             print(self.object, self.drawn, lineno())
             self.choices.update({self.object + str(self.object_count): self.drawn})
-            print(self.choices)
+            print(self.choices, lineno())
         else:
             diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
 
-            self.screen.coords(self.name_object, int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]), int(self.co_ords[3]))
+            self.screen.coords(self.screen.find_closest(event.x, event.y), int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]), int(self.co_ords[3]))
             #x1, y1, x2, y2 = self.screen.coords(self.drawn)
 
        
@@ -422,16 +424,15 @@ class Hello:
     def onClear(self, event):
         event.widget.delete(self.drawn)
 
-    def onMove(self, event):
-        if self.drawn:            
-            if trace: print (self.drawn, lineno())
-            canvas = event.widget
-            diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
-            canvas.move(self.drawn, diffX, diffY)
+
             
-            self.start = event
+            
         
 #flipping functions to suit desired object shape rect and oval or edit
+    def MyFunctionMove(self, event):
+        #if self.drawn:            
+        diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
+        self.screen.coords(self.screen.find_closest(event.x, event.y), int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]+diffX), int(self.co_ords[3]+diffY))
     def MyFunctionOval(self):
         self.myfunc = self.screen.create_oval
         self.object = "Oval"
@@ -450,9 +451,10 @@ class Hello:
     def MyFunctionEdit(self):
         self.myfunc = self.screen.itemconfig 
         self.edit_type = 1
-        self.co_ords= self.screen.coords(self.drawn)
+        self.co_ords = self.screen.coords(self.drawn)
         self.name_object = self.drawn
         global choices
+        
         #choices.update({str(self.object): str(self.name_object)})
 
 
