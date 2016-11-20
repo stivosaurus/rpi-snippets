@@ -77,7 +77,7 @@ class Hello:
         self.screen.bind('<ButtonPress-1>', self.onStart)  
         self.screen.bind('<B1-Motion>',     self.onGrow)   
         self.screen.bind('<Double-1>',      self.onClear)
-        self.screen.bind('<B3-Motion>', self.MyFunctionMove)
+        self.screen.bind('<B3-Motion>', self.onMove)#for the move function
         #------------------------------------------------------------#
         #adding a right mouse action to total canvas/screen
         #------------------------------------------------------------#
@@ -403,6 +403,10 @@ class Hello:
             print(self.choices, lineno())
         else:
             diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
+            #FIXME Need to hold the object editing id in a variable that cant be change
+            # or change whgen moving the mouse 
+            #TODO self.screen.find_closest(event.x, event.y)
+            #make it select an object and hold same object till finnished
 
             self.screen.coords(self.screen.find_closest(event.x, event.y), int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]), int(self.co_ords[3]))
             #x1, y1, x2, y2 = self.screen.coords(self.drawn)
@@ -425,14 +429,19 @@ class Hello:
         event.widget.delete(self.drawn)
 
 
+    #FIXME Need to hold the object editing id in a variable that cant be change
+    # or change whgen moving the mouse TODO self.screen.find_closest(event.x, event.y)
+    #make it select a object and hold same object till finnished
+    
+    def onMove(self, event):
+        #if self.drawn:            
+        diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
+        self.screen.coords(self.screen.find_closest(event.x, event.y), int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]+diffX), int(self.co_ords[3]+diffY))
             
             
         
 #flipping functions to suit desired object shape rect and oval or edit
-    def MyFunctionMove(self, event):
-        #if self.drawn:            
-        diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
-        self.screen.coords(self.screen.find_closest(event.x, event.y), int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]+diffX), int(self.co_ords[3]+diffY))
+
     def MyFunctionOval(self):
         self.myfunc = self.screen.create_oval
         self.object = "Oval"
@@ -451,6 +460,7 @@ class Hello:
     def MyFunctionEdit(self):
         self.myfunc = self.screen.itemconfig 
         self.edit_type = 1
+        #FIXME Not the right place to grab an oibject coords this is for the move func
         self.co_ords = self.screen.coords(self.drawn)
         self.name_object = self.drawn
         global choices
