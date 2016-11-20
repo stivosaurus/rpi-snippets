@@ -7,6 +7,13 @@ import sys
 import os
 import RPi.GPIO as GPIO
 import string
+import inspect
+
+def lineno():
+    """Returns the current line number in our program."""
+    return inspect.currentframe().f_back.f_lineno
+
+
 shape = ''
 x=0
 y=0
@@ -56,6 +63,7 @@ class Hello:
         self.optionvar = 'red'
         self.myfunc = self.screen.create_oval
         self.object = "Oval"
+        self.object_count = 0
         #removed test objects
         '''
         self.screen.create_line(15, 25, 200, 25, fill = 'red')
@@ -85,8 +93,19 @@ class Hello:
         self.odometerz = tk.StringVar()
         self.odometerz.set('odometer 0')
         self.Zodometer = tk.Label(self.frame, textvariable = self.odometerz)
-        choices = ['red', 'green', 'blue', 'yellow','white', 'magenta']
-        self.options = tk.OptionMenu(self.frame, self.optionvar[0], *choices)
+        #dropdown menu#dropdown menu
+        self.object_var = tk.StringVar()
+        global choices
+        # Use dictionary to map names to ages.
+        self.choices = {'EDIT':''
+            
+        }
+        
+        self.editoption = tk.OptionMenu(self.frame, self.object_var, *self.choices)
+        self.object_var.set('edit')
+
+        self.editoption.grid(row = 1, column =0)
+
         #------------------------------------------------------------#
         #set up The images for buttons and logo
         #------------------------------------------------------------#
@@ -196,7 +215,6 @@ class Hello:
         self.RectButton.grid(row=6,column=2) 
         self.LineButton.grid(row=7,column=1) 
         self.EditButton.grid(row=7,column=2)
-        self.options.grid(row = 10, column = 1)
         
 #----------------------------------------------------------#
 #left/right up/down button images
@@ -230,7 +248,7 @@ class Hello:
         
     #open a new window future plan to use as file dialog   
     def new_window(self):
-        print("new window")
+        print("new window",  lineno())
         self.newWindow = tk.Toplevel(self.master)
         self.app = Zero(self.newWindow)
 
@@ -280,7 +298,7 @@ class Hello:
         #adding the draw line function to the stepper motors move buttons
         self.screen.create_line(self.x, self.y, int(text), self.y, smooth=True, fill = 'red')
         self.x = int(text)
-        print (self.x)
+        print (self.x , lineno())
 
 
 #------------------------------------------------------#
@@ -297,7 +315,7 @@ class Hello:
         self.odometery.set("Odometery: %s"%(text))
         self.screen.create_oval(self.x,self.y,self.x,int(text),smooth=True, fill = 'red')
         self.y = int(text)
-        print (self.y)  
+        print (self.y , lineno())  
 
 
     def downYController(self):
@@ -309,7 +327,7 @@ class Hello:
         self.odometery.set("Odometery: %s"%(text)) 
         self.screen.create_line(self.x,self.y,self.x,int(text),smooth=True, fill = 'red')
         self.y = int(text)
-        print (self.y) 
+        print (self.y, lineno()) 
 
 #--------------------------------------------------------#
 # update the Position on the arrow buttons yet to be defined
@@ -363,10 +381,13 @@ class Hello:
 #we define the mouse movement and the draw method
 #	circle  centerx, centery,  radius
 #-----------------------------------------------------------#
+#FIXME self.choices.update({'object_type': '21',}) needs to be updated every new object
+
+
     def onStart(self, event):
         self.start = event
         self.drawn = None
-
+        self.object_count = self.object_count + 1
     def onGrow(self, event):    
         if self.drawn: self.screen.delete(self.drawn)
         #this is the line that makes the object I need to have it in 
@@ -374,21 +395,23 @@ class Hello:
         if self.edit_type == 0:
             objectId = self.myfunc(self.start.x, self.start.y, event.x, event.y, width = 2)
             self.drawn = objectId
+            global choices
+            print(self.object, self.drawn, lineno())
+            self.choices.update({self.object + str(self.object_count): self.drawn})
+            print(self.choices)
         else:
-            #if self.object: self.screen.delete(self.object)
             diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
-            print(self.object, int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]), int(self.co_ords[3]))
-            self.screen.coords(self.object, int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]), int(self.co_ords[3]))
+
+            self.screen.coords(self.name_object, int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]), int(self.co_ords[3]))
             #x1, y1, x2, y2 = self.screen.coords(self.drawn)
-            #print(diffX, diffY, x2, y2)
-            #print(canvas.move(self.drawn, (self.co_ords[0]+diffX), (self.co_ords[1]+diffY)))
+
+       
             
-        print (self.Colour)
         if self.Colour == 0:
             self.screen.itemconfig(self.drawn, fill = 'red', tags=("one", "two"))
         else:
             self.screen.itemconfig(self.drawn, outline = 'green')
-        if trace: print (self.drawn)
+        if trace: print (self.drawn, lineno())
         #lines bellow show keywords and methods for config 
         #commented out to see options from one object scroll
         #to botom of this file
@@ -401,7 +424,7 @@ class Hello:
 
     def onMove(self, event):
         if self.drawn:            
-            if trace: print (self.drawn)
+            if trace: print (self.drawn, lineno())
             canvas = event.widget
             diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
             canvas.move(self.drawn, diffX, diffY)
@@ -428,7 +451,9 @@ class Hello:
         self.myfunc = self.screen.itemconfig 
         self.edit_type = 1
         self.co_ords= self.screen.coords(self.drawn)
-        self.object = self.drawn
+        self.name_object = self.drawn
+        global choices
+        #choices.update({str(self.object): str(self.name_object)})
 
 
 #to edit a object .itemconfig(<object id>, fill="blue") 
