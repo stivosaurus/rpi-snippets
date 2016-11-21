@@ -429,10 +429,10 @@ class Hello:
     def onClear(self, event):
         event.widget.delete(self.drawn)
 
-'''I have fixed this
-    #FIXME Need to hold the object editing id in a variable that cant be change
-    # or change whgen moving the mouse TODO self.screen.find_closest(event.x, event.y)
-    #make it select a object and hold same object till finnished'''
+        '''I have fixed this
+        #FIXME Need to hold the object editing id in a variable that cant be change
+        # or change whgen moving the mouse TODO self.screen.find_closest(event.x, event.y)
+        #make it select a object and hold same object till finnished'''
     
     def onMove(self, event):
         #This right click event selects object to edit or move
