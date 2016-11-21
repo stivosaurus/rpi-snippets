@@ -403,9 +403,8 @@ class Hello:
             print(self.choices, lineno())
         elif self.edit_type == 1:
             diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
-            #FIXME Need to hold the object editing id in a variable that cant be change
-            # or change whgen moving the mouse 
-            #TODO self.screen.find_closest(event.x, event.y)
+            
+            #self.screen.find_closest(event.x, event.y)
             #make it select an object and hold same object till finnished
             self.myfunc(self.name_object, int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]), int(self.co_ords[3]))
             #x1, y1, x2, y2 = self.screen.coords(self.drawn)
