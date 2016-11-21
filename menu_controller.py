@@ -430,11 +430,14 @@ class Hello:
         event.widget.delete(self.drawn)
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         '''I have fixed this
         #FIXME Need to hold the object editing id in a variable that cant be change
         # or change whgen moving the mouse TODO self.screen.find_closest(event.x, event.y)
         #make it select a object and hold same object till finnished'''
 =======
+=======
+>>>>>>> Stashed changes
     '''I have fixed this
     #FIXME Need to hold the object editing id in a variable that cant be change
     # or change whgen moving the mouse TODO self.screen.find_closest(event.x, event.y)
