@@ -77,7 +77,7 @@ class Hello:
         self.screen.bind('<ButtonPress-1>', self.onStart)  
         self.screen.bind('<B1-Motion>',     self.onGrow)   
         self.screen.bind('<Double-1>',      self.onClear)
-        self.screen.bind('<ButtonPress-3>', self.onMove)#for the move function
+        self.screen.bind('<ButtonPress-3>', self.OnSelect)#for the move function
         #------------------------------------------------------------#
         #adding a right mouse action to total canvas/screen
         #------------------------------------------------------------#
@@ -173,7 +173,7 @@ class Hello:
         self.LineButton = tk.Button(self.frame, text = 'Lines', width = 10, command = self.MyFunctionLine)
         self.EditButton = tk.Button(self.frame, text = 'Edit', width = 10, command =self.MyFunctionEdit)
 
-        self.MoveButton = tk.Button(self.frame, text = 'Move', width = 10, command =self.MyFunctionMove)
+        self.MoveButton = tk.Button(self.frame, text = 'Move', width = 10, command =self.MyFunctiOnMove)
         #self.PolygonButton2 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
         #self.PolygonButton3 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)        
 
@@ -429,17 +429,24 @@ class Hello:
     def onClear(self, event):
         event.widget.delete(self.drawn)
 
+<<<<<<< Updated upstream
         '''I have fixed this
         #FIXME Need to hold the object editing id in a variable that cant be change
         # or change whgen moving the mouse TODO self.screen.find_closest(event.x, event.y)
         #make it select a object and hold same object till finnished'''
+=======
+    '''I have fixed this
+    #FIXME Need to hold the object editing id in a variable that cant be change
+    # or change whgen moving the mouse TODO self.screen.find_closest(event.x, event.y)
+    #make it select a object and hold same object till finnished'''
+>>>>>>> Stashed changes
     
-    def onMove(self, event):
+    def OnSelect(self, event):
         #This right click event selects object to edit or move
         self.name_object = self.screen.find_closest(event.x, event.y)    
         self.co_ords = self.screen.coords(self.name_object)    
         
-#flipping functions to suit desired object shape rect and oval or edit
+#flipping functions to suit desired object shape rect and oval or edit and move
 
     def MyFunctionOval(self):
         self.myfunc = self.screen.create_oval
@@ -459,7 +466,7 @@ class Hello:
     def MyFunctionEdit(self):
         self.myfunc = self.screen.coords 
         self.edit_type = 1
-    def MyFunctionMove(self):
+    def MyFunctiOnMove(self):
         self.myfunc = self.screen.coords 
         self.edit_type = 2
         
