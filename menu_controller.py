@@ -77,7 +77,7 @@ class Hello:
         self.screen.bind('<ButtonPress-1>', self.onStart)  
         self.screen.bind('<B1-Motion>',     self.onGrow)   
         self.screen.bind('<Double-1>',      self.onClear)
-        self.screen.bind('<B3-Motion>', self.onMove)#for the move function
+        self.screen.bind('<ButtonPress-3>', self.onMove)#for the move function
         #------------------------------------------------------------#
         #adding a right mouse action to total canvas/screen
         #------------------------------------------------------------#
@@ -95,7 +95,6 @@ class Hello:
         self.Zodometer = tk.Label(self.frame, textvariable = self.odometerz)
         #dropdown menu#dropdown menu
         self.object_var = tk.StringVar()
-        global choices
         # Use dictionary to map names to ages.
         self.choices = {'EDIT':''
             
@@ -174,7 +173,7 @@ class Hello:
         self.LineButton = tk.Button(self.frame, text = 'Lines', width = 10, command = self.MyFunctionLine)
         self.EditButton = tk.Button(self.frame, text = 'Edit', width = 10, command =self.MyFunctionEdit)
 
-        self.MoveButton = tk.Button(self.frame, text = 'Move', width = 10)
+        self.MoveButton = tk.Button(self.frame, text = 'Move', width = 10, command =self.MyFunctionMove)
         #self.PolygonButton2 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)
         #self.PolygonButton3 = tk.Button(self.frame, text = 'Quit', width = 10, command = self.close_windows)        
 
@@ -216,7 +215,7 @@ class Hello:
         self.RectButton.grid(row=6,column=2) 
         self.LineButton.grid(row=7,column=1) 
         self.EditButton.grid(row=7,column=2)
-        #self.MoveButton.grid(row=8, column=1)
+        self.MoveButton.grid(row=8, column=1)
         
 #----------------------------------------------------------#
 #left/right up/down button images
@@ -399,18 +398,20 @@ class Hello:
             self.drawn = objectId
             global choices
             print(self.object, self.drawn, lineno())
+            #here is where we add to dropdown menu but its not updating
             self.choices.update({self.object + str(self.object_count): self.drawn})
             print(self.choices, lineno())
-        else:
+        elif self.edit_type == 1:
             diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
             #FIXME Need to hold the object editing id in a variable that cant be change
             # or change whgen moving the mouse 
             #TODO self.screen.find_closest(event.x, event.y)
             #make it select an object and hold same object till finnished
-
-            self.screen.coords(self.screen.find_closest(event.x, event.y), int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]), int(self.co_ords[3]))
+            self.myfunc(self.name_object, int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]), int(self.co_ords[3]))
             #x1, y1, x2, y2 = self.screen.coords(self.drawn)
-
+        else:
+            diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
+            self.myfunc(self.name_object, int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]+diffX), int(self.co_ords[3]+diffY))
        
             
         if self.Colour == 0:
@@ -428,17 +429,15 @@ class Hello:
     def onClear(self, event):
         event.widget.delete(self.drawn)
 
-
+'''I have fixed this
     #FIXME Need to hold the object editing id in a variable that cant be change
     # or change whgen moving the mouse TODO self.screen.find_closest(event.x, event.y)
-    #make it select a object and hold same object till finnished
+    #make it select a object and hold same object till finnished'''
     
     def onMove(self, event):
-        #if self.drawn:            
-        diffX, diffY = (event.x - self.start.x), (event.y - self.start.y)
-        self.screen.coords(self.screen.find_closest(event.x, event.y), int(self.co_ords[0]+diffX), int(self.co_ords[1]+diffY), int(self.co_ords[2]+diffX), int(self.co_ords[3]+diffY))
-            
-            
+        #This right click event selects object to edit or move
+        self.name_object = self.screen.find_closest(event.x, event.y)    
+        self.co_ords = self.screen.coords(self.name_object)    
         
 #flipping functions to suit desired object shape rect and oval or edit
 
@@ -458,12 +457,11 @@ class Hello:
         self.Colour = 0
         self.edit_type = 0
     def MyFunctionEdit(self):
-        self.myfunc = self.screen.itemconfig 
+        self.myfunc = self.screen.coords 
         self.edit_type = 1
-        #FIXME Not the right place to grab an oibject coords this is for the move func
-        self.co_ords = self.screen.coords(self.drawn)
-        self.name_object = self.drawn
-        global choices
+    def MyFunctionMove(self):
+        self.myfunc = self.screen.coords 
+        self.edit_type = 2
         
         #choices.update({str(self.object): str(self.name_object)})
 
