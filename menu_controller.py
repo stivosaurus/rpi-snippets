@@ -8,6 +8,7 @@ import os
 import RPi.GPIO as GPIO
 import string
 import inspect
+from tkinter import messagebox
 
 def lineno():
     """Returns the current line number in our program."""
@@ -53,7 +54,7 @@ class Hello:
         self.Made = {}
         self.x =0
         self.y =0
-
+        self.name_object = None
 #------------------------------------------------------------#
 #screen controlls
 #------------------------------------------------------------#
@@ -426,7 +427,7 @@ class Hello:
         #print(objectId , self.object ,self.start.x, self.start.y, event.x, event.y)
 
     def onClear(self, event):
-        event.widget.delete(self.drawn)
+        event.widget.delete(sel,self.drawn)
 
 
         '''I have fixed this
@@ -438,7 +439,8 @@ class Hello:
     def OnSelect(self, event):
         #This right click event selects object to edit or move
         self.name_object = self.screen.find_closest(event.x, event.y)    
-        self.co_ords = self.screen.coords(self.name_object)    
+        self.co_ords = self.screen.coords(self.name_object)
+        print (self.screen.type(self.name_object), self.name_object, (self.screen.coords(self.name_object)))  
         
 #flipping functions to suit desired object shape rect and oval or edit and move
 
@@ -460,9 +462,12 @@ class Hello:
     def MyFunctionEdit(self):
         self.myfunc = self.screen.coords 
         self.edit_type = 1
+        if self.name_object == None: messagebox.showinfo("Warning", "You need to right click an object before you can edit or move")
+          
     def MyFunctiOnMove(self):
         self.myfunc = self.screen.coords 
         self.edit_type = 2
+        if self.name_object == None: messagebox.showinfo("Warning", "You need to right click an object before you can edit or move")
         
         #choices.update({str(self.object): str(self.name_object)})
 
@@ -486,6 +491,8 @@ class Zero:
         self.frame.grid()
     def close_windows(self):
         self.master.destroy()
+
+
 
 #------------------------------------------------------#
 #                 Main Program loop
