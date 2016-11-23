@@ -440,7 +440,8 @@ class Hello:
         #This right click event selects object to edit or move
         self.name_object = self.screen.find_closest(event.x, event.y)    
         self.co_ords = self.screen.coords(self.name_object)
-        print (self.screen.type(self.name_object), self.name_object, (self.screen.coords(self.name_object)))  
+        print (self.screen.type(self.name_object), self.name_object, (self.screen.coords(self.name_object))) 
+        #print(self.screen.itemcget(self.name_object,)) 
         
 #flipping functions to suit desired object shape rect and oval or edit and move
 
